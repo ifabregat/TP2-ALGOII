@@ -1,0 +1,15 @@
+- Realizar correcciones de los trabajos anteriores (TP1, Lista/Pila/Cola, ABB)
+
+- Partes del juego a desarrollar:
+    - Menu (TDA)
+        - Mostrar 4 opciones
+        - Leer la opcion y validarla
+        - Mostrar la Pokedex
+        - Cargar semilla
+        - Iniciar el juego
+        - Salir del juego
+    - Pokedex
+        - Leer archivo con los pokemones
+        - Cargar los pokemones en una lista
+        - Mostrar los pokemones
+    - Semilla
