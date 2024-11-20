@@ -118,6 +118,7 @@ bool menu_ejecutar_opcion(menu_t *menu, char opcion)
         }
     } while (!item);
 
+	printf("\n");
     item->accion();
     return true;
 }
