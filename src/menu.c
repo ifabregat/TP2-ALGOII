@@ -1,33 +1,123 @@
 #include "menu.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#include "lista.h"
 #include "../extra/ansi.h"
 
-void mostrarLogo()
+struct menu {
+	Lista *opciones;
+};
+
+menu_t *menu_crear()
 {
-    printf(ANSI_RESET_SCREEN);
-    printf(ANSI_COLOR_BLUE "                                  ,'\\\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_BLUE "    _.----.        ____         ,'  _\\   ___    ___     ____\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_BLUE "_,-'       `.     |    |  /`.   \\,-'    |   \\  /   |   |    \\  |`.\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_YELLOW " \\.    \\ \\   |  __  |  |/    ,','_  `.  |          | __  |    \\|  |\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_YELLOW "   \\    \\/   /,' _`.|      ,' / / / /   |          ,' _`.|     |  |\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_YELLOW "    \\     ,-'/  /   \\    ,'   | \\/ / ,`.|         /  /   \\  |     |\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_YELLOW "     \\    \\ |   \\_/  |   `-.  \\    `'  /|  |    ||   \\_/  | |\\    |\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_YELLOW "      \\    \\ \\      /       `-.`.___,-' |  |\\  /| \\      /  | |   |\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_BLUE "       \\    \\ `.__,'|  |`-._    `|      |__| \\/ |  `.__,'|  | |   |\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_BLUE "        \\_.-'       |__|    `-._ |              '-.|     '-.| |   |\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_BLUE "                                `'                            '-._|\n" ANSI_COLOR_RESET);
+	menu_t *menu = malloc(sizeof(menu_t));
+
+	if (!menu)
+		return NULL;
+
+	menu->opciones = lista_crear();
+
+	if (!menu->opciones) {
+		free(menu);
+		return NULL;
+	}
+
+	return menu;
 }
 
-void mostrarMenu()
+void menu_destruir(menu_t *menu, void (*destructor)(void *))
 {
-    printf(ANSI_COLOR_BLUE "                            (P) Pokedex\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_YELLOW "                            (J) Jugar\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_YELLOW "                            (S) Semilla\n" ANSI_COLOR_RESET);
-    printf(ANSI_COLOR_BLUE "                            (Q) Salir\n" ANSI_COLOR_RESET);
+	if (menu->opciones)
+		lista_destruir_todo(menu->opciones, destructor);
+	free(menu);
 }
 
-int main()
+bool menu_agregar_opcion(menu_t *menu, char opcion, char *descripcion,
+			 void (*accion)())
 {
-    mostrarLogo();
-    mostrarMenu();
-    return 0;
+	if (!menu || !descripcion) {
+		return false;
+	}
+
+	menuItem_t *item = malloc(sizeof(menuItem_t));
+	if (!item) {
+		return false;
+	}
+
+	item->opcion = (char)toupper(opcion);
+	item->accion = accion;
+
+	size_t descripcion_len = strlen(descripcion) + 1;
+	item->descripcion = malloc(descripcion_len);
+	if (!item->descripcion) {
+		free(item);
+		return false;
+	}
+
+	strncpy(item->descripcion, descripcion, descripcion_len);
+
+	if (!lista_agregar_al_final(menu->opciones, item)) {
+		free(item->descripcion);
+		free(item);
+		return false;
+	}
+
+	return true;
+}
+
+void menu_mostrar(menu_t *menu)
+{
+	size_t cantidad = lista_cantidad_elementos(menu->opciones);
+
+	printf(ANSI_RESET_SCREEN);
+
+	printf("Seleccione una opcion: \n");
+
+	for (size_t i = 0; i < cantidad; i++) {
+		menuItem_t *item = NULL;
+
+		lista_obtener_elemento(menu->opciones, i, (void **)&item);
+
+		printf("%s  (%c)%s %s\n", ANSI_COLOR_BOLD, item->opcion, ANSI_COLOR_RESET, item->descripcion);
+	}
+	printf("Ingrese una opcion: ");
+}
+
+int comparar_opciones(void *a, void *b)
+{
+	if (!a || !b)
+		return 0;
+
+	return *(char *)a - *(char *)b;
+}
+
+bool menu_ejecutar_opcion(menu_t *menu, char opcion)
+{
+    if (!menu)
+        return false;
+
+    menuItem_t *item = NULL;
+
+    do {
+        opcion = (char)toupper(opcion);
+
+        item = lista_buscar_elemento(menu->opciones, &opcion, comparar_opciones);
+
+        if (!item) {
+			menu_mostrar(menu);
+
+
+			if (scanf(" %c", &opcion) != 1)
+			{
+				printf("Error al leer la opción\n");
+				return false;
+			}
+        }
+    } while (!item);
+
+    item->accion();
+    return true;
 }
