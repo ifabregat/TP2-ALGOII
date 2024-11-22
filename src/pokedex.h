@@ -35,7 +35,7 @@ bool pokedex_agregar_pokemon(pokedex_t *pokedex, char *ruta);
 * Ordena los pokemones del pokedex por nombre.
 * Devuelve true si se pudieron ordenar los pokemones, false en caso contrario.
 */
-bool lista_ordenar(pokedex_t *pokedex, int (*comparador)(void *, void *));
+void pokedex_ordenar(pokedex_t *pokedex, int (*comparador)(void *, void *));
 
 /*
 * Devuelve la cantidad de pokemones en el pokedex.

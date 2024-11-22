@@ -219,15 +219,15 @@ int comparador_nombre_ascendente(void *a, void *b) {
     return strcmp(pokemon_a->nombre, pokemon_b->nombre);
 }
 
-bool lista_ordenar(pokedex_t *pokedex, int (*comparador)(void *, void *))
+void pokedex_ordenar(pokedex_t *pokedex, int (*comparador)(void *, void *))
 {
     if (pokedex->pokemones == NULL || comparador == NULL) {
-        return false;
+        return;
     }
 
     size_t cantidad = lista_cantidad_elementos(pokedex->pokemones);
     if (cantidad < 2) {
-        return true;
+        return;
     }
 
     for (size_t i = 0; i < cantidad - 1; i++) {
@@ -235,7 +235,7 @@ bool lista_ordenar(pokedex_t *pokedex, int (*comparador)(void *, void *))
             void *elemento_j, *elemento_j1;
             if (!lista_obtener_elemento(pokedex->pokemones, j, &elemento_j) || 
                 !lista_obtener_elemento(pokedex->pokemones, j + 1, &elemento_j1)) {
-                return false;
+                return;
             }
 
             if (comparador(elemento_j, elemento_j1) > 0) {
@@ -246,7 +246,7 @@ bool lista_ordenar(pokedex_t *pokedex, int (*comparador)(void *, void *))
         }
     }
 
-    return true;
+    return;
 }
 
 size_t pokedex_cantidad(pokedex_t *pokedex)
@@ -272,7 +272,7 @@ pokemon_t *pokedex_obtener_pokemon_random(pokedex_t *pokedex)
 
 size_t pokedex_iterar_pokemones(pokedex_t *pokedex, bool (*funcion)(pokemon_t *, void *), void *ctx)
 {
-    lista_ordenar(pokedex, comparador_nombre_ascendente);
+    pokedex_ordenar(pokedex, comparador_nombre_ascendente);
 
     return lista_iterar_elementos(pokedex->pokemones, (bool (*)(void *, void *))funcion, ctx);
 }
