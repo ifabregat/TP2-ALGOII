@@ -137,6 +137,8 @@ void agregarPokemones()
 
 void obtenerPokemonAleatorio()
 {
+	srand((unsigned int)time(NULL));
+
 	pokedex_t *pokedex = pokedex_crear();
 
 	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
