@@ -3,6 +3,7 @@
 #include "./src/menu.h"
 #include "./src/pokedex.h"
 #include <stdlib.h>
+#include <time.h>
 
 void destructor(void *elemento)
 {
@@ -101,6 +102,119 @@ void seleccionarOpcion()
 	menu_destruir(menu, destructor);
 }
 
+void crearPokedex()
+{
+	pokedex_t *pokedex = pokedex_crear();
+
+	pa2m_afirmar(pokedex != NULL, "Puedo crear un pokedex");
+
+	pokedex_destruir_todo(pokedex, NULL);
+}
+
+void destructor_pokemones(void *elemento)
+{
+	pokemon_t *pokemon = (pokemon_t *)elemento;
+	free(pokemon->nombre);
+	free(pokemon->color);
+	free(pokemon->movimientos);
+	free(pokemon);
+}
+
+void agregarPokemones()
+{
+	pokedex_t *pokedex = pokedex_crear();
+
+	pa2m_afirmar(pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv"), "Puedo agregar pokemones al pokedex");
+
+	size_t cantidad = pokedex_cantidad(pokedex);
+
+	printf("Cantidad de pokemones: %ld\n", cantidad);
+
+	pa2m_afirmar(pokedex_cantidad(pokedex) == 10, "La cantidad de pokemones es la correcta");
+
+	pokedex_destruir_todo(pokedex, destructor_pokemones);
+}
+
+void obtenerPokemonAleatorio()
+{
+	pokedex_t *pokedex = pokedex_crear();
+
+	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
+
+	pokemon_t *pokemon = pokedex_obtener_pokemon_random(pokedex);
+
+	printf("Pokemon aleatorio: %s\n", pokemon->nombre);
+
+	pa2m_afirmar(pokemon != NULL, "Puedo obtener un pokemon aleatorio");
+
+	pokedex_destruir_todo(pokedex, destructor_pokemones);
+}
+
+void obtenerSietePokemonesAleatorios()
+{
+	srand((unsigned int)time(NULL));
+
+	pokedex_t *pokedex = pokedex_crear();
+
+	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
+
+	for (int i = 0; i < 7; i++)
+	{
+		pokemon_t *pokemon = pokedex_obtener_pokemon_random(pokedex);
+
+		printf("Pokemon aleatorio: %s\n", pokemon->nombre);
+	}
+
+	pokedex_destruir_todo(pokedex, destructor_pokemones);
+}
+
+bool imprimir_pokemon(pokemon_t *pokemon, void *ctx)
+{
+	printf("%s%s%s%s", ANSI_COLOR_BOLD, pokemon->color, pokemon->nombre, ANSI_COLOR_RESET);
+
+	printf("%s (%s)", ANSI_COLOR_BOLD, pokemon->movimientos);
+
+	printf(" ➡ %d puntos %s\n", pokemon->puntaje, ANSI_COLOR_RESET);
+
+	return true;
+}
+
+void mostrarPokemones()
+{
+	pokedex_t *pokedex = pokedex_crear();
+
+	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
+
+	pokedex_iterar_pokemones(pokedex, imprimir_pokemon, NULL);
+
+	pokedex_destruir_todo(pokedex, destructor_pokemones);
+}
+
+void menuMostrarPokedex()
+{
+	pokedex_t *pokedex = pokedex_crear();
+
+	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
+
+	menu_t *menu = menu_crear();
+
+	menu_agregar_opcion(menu, 'P', "Mostrar pokedex", (void (*)(void))mostrarPokemones);
+	
+	menu_mostrar(menu);
+
+	char opcion = 0;
+
+	if (scanf("%c", &opcion) != 1)
+	{
+		printf("Error al leer la opcion\n");
+	}
+
+	menu_ejecutar_opcion(menu, opcion);
+
+	menu_destruir(menu, destructor);
+	pokedex_destruir_todo(pokedex, destructor_pokemones);
+}
+
 int main()
 {
 	pa2m_nuevo_grupo("Pruebas de menu");
@@ -113,7 +227,17 @@ int main()
 	mostrarMenu();
 	printf("\n");
 	seleccionarOpcion();
-
+	pa2m_nuevo_grupo("Pruebas de pokedex");
+	crearPokedex();
+	printf("\n");
+	agregarPokemones();
+	printf("\n");
+	mostrarPokemones();
+	printf("\n");
+	obtenerPokemonAleatorio();
+	printf("\n");
+	obtenerSietePokemonesAleatorios();
+	menuMostrarPokedex();
 
 	return pa2m_mostrar_reporte();
 }
