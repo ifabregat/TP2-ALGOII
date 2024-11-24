@@ -1,8 +1,4 @@
 #include "menu.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
 #include "lista.h"
 #include "../extra/ansi.h"
@@ -72,8 +68,6 @@ void menu_mostrar(menu_t *menu)
 {
 	size_t cantidad = lista_cantidad_elementos(menu->opciones);
 
-	printf(ANSI_RESET_SCREEN);
-
 	printf("Seleccione una opcion: \n");
 
 	for (size_t i = 0; i < cantidad; i++) {
@@ -81,7 +75,8 @@ void menu_mostrar(menu_t *menu)
 
 		lista_obtener_elemento(menu->opciones, i, (void **)&item);
 
-		printf("%s  (%c)%s %s\n", ANSI_COLOR_BOLD, item->opcion, ANSI_COLOR_RESET, item->descripcion);
+		printf("%s  (%c)%s %s\n", ANSI_COLOR_BOLD, item->opcion,
+		       ANSI_COLOR_RESET, item->descripcion);
 	}
 	printf("Ingrese una opcion: ");
 }
@@ -96,29 +91,15 @@ int comparar_opciones(void *a, void *b)
 
 bool menu_ejecutar_opcion(menu_t *menu, char opcion)
 {
-    if (!menu)
-        return false;
+	if (!menu)
+		return false;
 
-    menuItem_t *item = NULL;
+	menuItem_t *item = NULL;
 
-    do {
-        opcion = (char)toupper(opcion);
+	item = lista_buscar_elemento(menu->opciones, &opcion,
+				     comparar_opciones);
 
-        item = lista_buscar_elemento(menu->opciones, &opcion, comparar_opciones);
+	item->accion();
 
-        if (!item) {
-			menu_mostrar(menu);
-
-
-			if (scanf(" %c", &opcion) != 1)
-			{
-				printf("Error al leer la opción\n");
-				return false;
-			}
-        }
-    } while (!item);
-
-	printf("\n");
-    item->accion();
-    return true;
+	return true;
 }
