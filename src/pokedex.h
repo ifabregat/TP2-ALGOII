@@ -43,6 +43,11 @@ void pokedex_ordenar(pokedex_t *pokedex, int (*comparador)(void *, void *));
 size_t pokedex_cantidad(pokedex_t *pokedex);
 
 /*
+* Devuelve el pokemon en la posición del pokedex.
+*/
+pokemon_t *pokedex_obtener_pokemon(pokedex_t *pokedex, size_t pos);
+
+/*
 * Devuelve un pokemon aleatorio del pokedex.
 */
 pokemon_t *pokedex_obtener_pokemon_random(pokedex_t *pokedex);
