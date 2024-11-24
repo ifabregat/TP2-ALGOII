@@ -96,8 +96,12 @@ bool menu_ejecutar_opcion(menu_t *menu, char opcion)
 
 	menuItem_t *item = NULL;
 
-	item = lista_buscar_elemento(menu->opciones, &opcion,
-				     comparar_opciones);
+	opcion = (char)toupper(opcion);
+
+	item = lista_buscar_elemento(menu->opciones, &opcion, comparar_opciones);
+
+	if (!item)
+		return false;
 
 	item->accion();
 
