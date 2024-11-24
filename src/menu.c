@@ -101,7 +101,10 @@ bool menu_ejecutar_opcion(menu_t *menu, char opcion)
 	item = lista_buscar_elemento(menu->opciones, &opcion, comparar_opciones);
 
 	if (!item)
+	{
+		printf("Opcion invalida\n");
 		return false;
+	}
 
 	item->accion();
 
