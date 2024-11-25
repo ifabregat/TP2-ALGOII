@@ -160,6 +160,56 @@ void tablero_eliminar_pokemon(Lista *pokemones, pokemonTablero_t *pokemon)
 	lista_iterador_destruir(iterador);
 }
 
+void tablero_agregar_pokemon(Lista *pokedex, Lista *pokemones)
+{
+	size_t indice = (size_t)rand() * (size_t)time(NULL) % lista_cantidad_elementos(pokedex);
+
+	pokemon_t *pokemon_pokedex = NULL;
+	if (!lista_obtener_elemento(pokedex, indice, (void **)&pokemon_pokedex))
+		return;
+
+	pokemonTablero_t *nuevo_pokemon = malloc(sizeof(pokemonTablero_t));
+	if (!nuevo_pokemon)
+		return;
+
+	nuevo_pokemon->x = (size_t)rand() % ANCHO_TABLERO;
+	nuevo_pokemon->y = (size_t)rand() % ALTO_TABLERO;
+
+	nuevo_pokemon->nombre = malloc(strlen(pokemon_pokedex->nombre) + 1);
+	if (!nuevo_pokemon->nombre)
+	{
+		free(nuevo_pokemon);
+		return;
+	}
+	strcpy(nuevo_pokemon->nombre, pokemon_pokedex->nombre);
+
+	nuevo_pokemon->letra = pokemon_pokedex->nombre[0];
+	nuevo_pokemon->puntaje = pokemon_pokedex->puntaje;
+
+	nuevo_pokemon->color = malloc(strlen(pokemon_pokedex->color) + 1);
+	if (!nuevo_pokemon->color)
+	{
+		free(nuevo_pokemon->nombre);
+		free(nuevo_pokemon);
+		return;
+	}
+	strcpy(nuevo_pokemon->color, pokemon_pokedex->color);
+
+	nuevo_pokemon->movimientos = malloc(strlen(pokemon_pokedex->movimientos) + 1);
+	if (!nuevo_pokemon->movimientos)
+	{
+		free(nuevo_pokemon->color);
+		free(nuevo_pokemon->nombre);
+		free(nuevo_pokemon);
+		return;
+	}
+	strcpy(nuevo_pokemon->movimientos, pokemon_pokedex->movimientos);
+
+	nuevo_pokemon->indiceMovimiento = 0;
+
+	lista_agregar_al_final(pokemones, nuevo_pokemon);
+}
+
 jugador_t *jugador_crear()
 {
 	jugador_t *jugador = malloc(sizeof(jugador_t));
