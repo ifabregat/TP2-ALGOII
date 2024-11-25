@@ -178,19 +178,132 @@ int min(int a, int b)
 	return a < b ? a : b;
 }
 
+void procesar_movimiento_pokemones(Lista *pokemones, int entrada)
+{
+	Lista_iterador *iterador = lista_iterador_crear(pokemones);
+	if (!iterador)
+		return;
+
+	while (lista_iterador_hay_siguiente(iterador)) {
+		pokemonTablero_t *pokemon =
+			lista_iterador_obtener_elemento_actual(iterador);
+		if (!pokemon) {
+			lista_iterador_avanzar(iterador);
+			continue;
+		}
+
+		if (pokemon->movimientos[pokemon->indiceMovimiento] == '\0') {
+			pokemon->indiceMovimiento = 0;
+		}
+		char movimiento =
+			pokemon->movimientos[pokemon->indiceMovimiento];
+
+		// Procesar el movimiento del Pokémon
+		switch (movimiento) {
+		case 'N': // Movimiento hacia arriba
+			pokemon->y = max(0, pokemon->y - 1);
+			break;
+
+		case 'S': // Movimiento hacia abajo
+			pokemon->y = min(ALTO_TABLERO - 1, pokemon->y + 1);
+			break;
+
+		case 'E': // Movimiento hacia la derecha
+			pokemon->x = min(ANCHO_TABLERO - 1, pokemon->x + 1);
+			break;
+
+		case 'O': // Movimiento hacia la izquierda
+			pokemon->x = max(0, pokemon->x - 1);
+			break;
+
+		case 'J': // Mismo movimiento que el jugador
+			switch (entrada) {
+			case TECLA_ARRIBA:
+				pokemon->y = max(0, pokemon->y - 1);
+				break;
+			case TECLA_ABAJO:
+				pokemon->y =
+					min(ALTO_TABLERO - 1, pokemon->y + 1);
+				break;
+			case TECLA_IZQUIERDA:
+				pokemon->x = max(0, pokemon->x - 1);
+				break;
+			case TECLA_DERECHA:
+				pokemon->x =
+					min(ANCHO_TABLERO - 1, pokemon->x + 1);
+				break;
+			}
+			break;
+
+		case 'I': // Movimiento del jugador invertido
+			switch (entrada) {
+			case TECLA_ARRIBA:
+				pokemon->y =
+					min(ALTO_TABLERO - 1, pokemon->y + 1);
+				break;
+			case TECLA_ABAJO:
+				pokemon->y = max(0, pokemon->y - 1);
+				break;
+			case TECLA_IZQUIERDA:
+				pokemon->x =
+					min(ANCHO_TABLERO - 1, pokemon->x + 1);
+				break;
+			case TECLA_DERECHA:
+				pokemon->x = max(0, pokemon->x - 1);
+				break;
+			}
+			break;
+
+		case 'R': // Movimiento aleatorio
+			switch (rand() % 4) {
+			case 0:
+				pokemon->y = max(0, pokemon->y - 1); // Arriba
+				break;
+			case 1:
+				pokemon->y = min(ALTO_TABLERO - 1,
+						 pokemon->y + 1); // Abajo
+				break;
+			case 2:
+				pokemon->x = min(ANCHO_TABLERO - 1,
+						 pokemon->x + 1); // Derecha
+				break;
+			case 3:
+				pokemon->x =
+					max(0, pokemon->x - 1); // Izquierda
+				break;
+			}
+			break;
+
+		default:
+			// Movimiento no válido, ignorar
+			break;
+		}
+
+		pokemon->indiceMovimiento++;
+
+		lista_iterador_avanzar(iterador);
+	}
+
+	lista_iterador_destruir(iterador);
+}
+
 void procesar_entrada(int entrada, jugador_t *jugador, Lista *pokemones)
 {
 	if (entrada == TECLA_ARRIBA) {
 		jugador->y--;
+		procesar_movimiento_pokemones(pokemones, entrada);
 		jugador->movimientos++;
 	} else if (entrada == TECLA_ABAJO) {
 		jugador->y++;
+		procesar_movimiento_pokemones(pokemones, entrada);
 		jugador->movimientos++;
 	} else if (entrada == TECLA_IZQUIERDA) {
 		jugador->x--;
+		procesar_movimiento_pokemones(pokemones, entrada);
 		jugador->movimientos++;
 	} else if (entrada == TECLA_DERECHA) {
 		jugador->x++;
+		procesar_movimiento_pokemones(pokemones, entrada);
 		jugador->movimientos++;
 	}
 

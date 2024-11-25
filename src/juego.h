@@ -25,6 +25,7 @@ typedef struct pokemonTablero {
 	int puntaje;
 	char *color;
 	char *movimientos;
+	size_t indiceMovimiento;
 } pokemonTablero_t;
 
 typedef struct jugador {
