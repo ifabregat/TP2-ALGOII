@@ -615,6 +615,92 @@ void jugadorMueveIzquierda()
 	tablero_destruir(tablero, NULL);
 }
 
+void primerPokemonCazado()
+{
+	jugador_t *jugador = jugador_crear();
+
+	pokemonTablero_t pokemon = { .nombre = "Bulbasaur", .color = ANSI_COLOR_BLUE, .letra = 'B', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+
+	administrar_puntaje(jugador, &pokemon);
+
+	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon, "El primer pokemon atrapado es Bulbasaur");
+
+	pa2m_afirmar(jugador->puntaje == 10, "El puntaje del jugador es 10");
+
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1, "La racha actual tiene 1 pokemones");
+
+	pa2m_afirmar(jugador->multiplicador == 1, "El multiplicador del jugador es 1");
+
+	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 0, "La racha mayor tiene 0 pokemones");
+
+	jugador_destruir(jugador, NULL);
+}
+
+void variosPokemonesCazados()
+{
+	jugador_t *jugador = jugador_crear();
+
+	pokemonTablero_t pokemon = { .nombre = "Bulbasaur", .color = ANSI_COLOR_BLUE, .letra = 'B', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+
+	administrar_puntaje(jugador, &pokemon);
+
+	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon, "El primer pokemon atrapado es Bulbasaur");
+
+	pa2m_afirmar(jugador->puntaje == 10, "El puntaje del jugador es 10");
+
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1, "La racha actual tiene 1 pokemones");
+
+	pa2m_afirmar(jugador->multiplicador == 1, "El multiplicador del jugador es 1");
+
+	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 0, "La racha mayor tiene 0 pokemones");
+
+	printf("\n");
+
+	pokemonTablero_t pokemon2 = { .nombre = "Charmander", .color = ANSI_COLOR_RED, .letra = 'C', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+
+	administrar_puntaje(jugador, &pokemon2);
+
+	pa2m_afirmar(pila_tope(jugador->rachaMayor) == &pokemon, "El segundo pokemon atrapado es Charmander");
+
+	pa2m_afirmar(jugador->puntaje == 20, "El puntaje del jugador es 20");
+
+	pa2m_afirmar(jugador->multiplicador == 1, "El multiplicador del jugador es 1");
+
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1, "La racha actual tiene 1 pokemones");
+
+	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 1, "La racha mayor tiene 1 pokemones");
+
+	printf("\n");
+
+	administrar_puntaje(jugador, &pokemon2);
+
+	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon2, "El tercer pokemon atrapado es Charmander");
+
+	pa2m_afirmar(jugador->puntaje == 40, "El puntaje del jugador es 40");
+
+	pa2m_afirmar(jugador->multiplicador == 2, "El multiplicador del jugador es 2");
+
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 2, "La racha actual tiene 2 pokemones");
+
+	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 1, "La racha mayor tiene 1 pokemones");
+
+	administrar_puntaje(jugador, &pokemon2);
+
+	printf("\n");
+
+	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon2, "El cuarto pokemon atrapado es Charmander");
+
+	pa2m_afirmar(jugador->puntaje == 70, "El puntaje del jugador es 70");
+
+	pa2m_afirmar(jugador->multiplicador == 3, "El multiplicador del jugador es 3");
+
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 3, "La racha actual tiene 3 pokemones");
+
+	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 1, "La racha mayor tiene 1 pokemones");
+
+	jugador_destruir(jugador, NULL);
+}
+
 int main()
 {
 	pa2m_nuevo_grupo("Pruebas de menu");
@@ -661,6 +747,10 @@ int main()
 	jugadorMueveDerecha();
 	printf("\n");
 	jugadorMueveIzquierda();
+	printf("\n");
+	primerPokemonCazado();
+	printf("\n");
+	variosPokemonesCazados();
 
 	return pa2m_mostrar_reporte();
 }
