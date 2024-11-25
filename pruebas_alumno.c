@@ -786,6 +786,72 @@ void eliminarVariosPokemones()
 	jugador_destruir(jugador, NULL);	
 }
 
+void agregarUnPokemon()
+{
+	Lista *pokedex = pokedex_crear();
+
+	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
+	if (pokedex == NULL)
+	{
+		pa2m_afirmar(false, "No se pudo agregar pokemones al pokedex");
+		return;
+	}
+
+	Lista *pokemones = lista_crear();
+
+	tablero_agregar_pokemon(pokedex, pokemones);
+
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1, "Se pudo agregar un pokemon al tablero");
+
+	void *elemento = NULL;
+	lista_obtener_elemento(pokemones, 0, &elemento);
+
+	printf("Nombre: %s\n", ((pokemonTablero_t *)elemento)->nombre);
+
+	destructor_pokemones_tablero(elemento);
+	lista_destruir(pokemones);
+	pokedex_destruir_todo(pokedex, destructor_pokemones);
+}
+
+void agregarVariosPokemones()
+{
+	Lista *pokedex = pokedex_crear();
+
+	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
+	if (pokedex == NULL)
+	{
+		pa2m_afirmar(false, "No se pudo agregar pokemones al pokedex");
+		return;
+	}
+
+	Lista *pokemones = lista_crear();
+
+	tablero_agregar_pokemon(pokedex, pokemones);
+
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1, "Se pudo agregar un pokemon al tablero");
+
+	void *elemento = NULL;
+	lista_obtener_elemento(pokemones, 0, &elemento);
+
+	printf("Nombre: %s\n", ((pokemonTablero_t *)elemento)->nombre);
+
+	destructor_pokemones_tablero(elemento);
+
+	printf("\n");
+
+	tablero_agregar_pokemon(pokedex, pokemones);
+
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 2, "Se pudo agregar un segundo pokemon al tablero");
+
+	lista_obtener_elemento(pokemones, 1, &elemento);
+
+	printf("Nombre: %s\n", ((pokemonTablero_t *)elemento)->nombre);
+
+	destructor_pokemones_tablero(elemento);
+	lista_destruir(pokemones);
+	pokedex_destruir_todo(pokedex, destructor_pokemones);
+}
+
 int main()
 {
 	pa2m_nuevo_grupo("Pruebas de menu");
@@ -840,6 +906,10 @@ int main()
 	eliminarPokemon();
 	printf("\n");
 	eliminarVariosPokemones();
+	printf("\n");
+	agregarUnPokemon();
+	printf("\n");
+	agregarVariosPokemones();
 
 	return pa2m_mostrar_reporte();
 }
