@@ -107,7 +107,7 @@ void seleccionarOpcion()
 
 void crearPokedex()
 {
-	pokedex_t *pokedex = pokedex_crear();
+	Lista *pokedex = pokedex_crear();
 
 	pa2m_afirmar(pokedex != NULL, "Puedo crear un pokedex");
 
@@ -125,7 +125,7 @@ void destructor_pokemones(void *elemento)
 
 void agregarPokemones()
 {
-	pokedex_t *pokedex = pokedex_crear();
+	Lista *pokedex = pokedex_crear();
 
 	pa2m_afirmar(pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv"),
 		     "Puedo agregar pokemones al pokedex");
@@ -144,7 +144,7 @@ void obtenerPokemonAleatorio()
 {
 	srand((unsigned int)time(NULL));
 
-	pokedex_t *pokedex = pokedex_crear();
+	Lista *pokedex = pokedex_crear();
 
 	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
 
@@ -161,7 +161,7 @@ void obtenerSietePokemonesAleatorios()
 {
 	srand((unsigned int)time(NULL));
 
-	pokedex_t *pokedex = pokedex_crear();
+	Lista *pokedex = pokedex_crear();
 
 	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
 
@@ -188,7 +188,7 @@ bool imprimir_pokemon(pokemon_t *pokemon, void *ctx)
 
 void mostrarPokemones()
 {
-	pokedex_t *pokedex = pokedex_crear();
+	Lista *pokedex = pokedex_crear();
 
 	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
 
@@ -205,7 +205,7 @@ void menuMostrarPokedex()
 
 	char *descripcion = "Pokedex";
 
-	menu_agregar_opcion(menu, 'p', descripcion, mostrarPokemones);
+	menu_agregar_opcion(menu, 'P', descripcion, mostrarPokemones);
 
 	menu_mostrar(menu);
 
@@ -254,7 +254,7 @@ void crearTableroConLista()
 {
 	Lista *pokemones = lista_crear();
 
-	pokedex_t *pokedex = pokedex_crear();
+	Lista *pokedex = pokedex_crear();
 
 	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
 
@@ -321,24 +321,19 @@ void crearTableroConLista()
 void imprimirTablero()
 {
 	tablero_t tablero = {
-		.ancho = 5,
-		.alto = 7,
-		.celdas = NULL,
-		.pokemones = NULL};
+		.ancho = 5, .alto = 7, .celdas = NULL, .pokemones = NULL
+	};
 
 	tablero.celdas = malloc((size_t)tablero.alto * (size_t)sizeof(char *));
-	if (!tablero.celdas)
-	{
+	if (!tablero.celdas) {
 		return;
 	}
 
-	for (int i = 0; i < tablero.alto; i++)
-	{
-		tablero.celdas[i] = malloc((size_t)tablero.ancho * (size_t)sizeof(char));
-		if (!tablero.celdas[i])
-		{
-			for (int j = 0; j < i; j++)
-			{
+	for (int i = 0; i < tablero.alto; i++) {
+		tablero.celdas[i] =
+			malloc((size_t)tablero.ancho * (size_t)sizeof(char));
+		if (!tablero.celdas[i]) {
+			for (int j = 0; j < i; j++) {
 				free(tablero.celdas[j]);
 			}
 			free(tablero.celdas);
@@ -349,10 +344,8 @@ void imprimirTablero()
 	}
 
 	jugador_t *jugador = jugador_crear();
-	if (!jugador)
-	{
-		for (int i = 0; i < tablero.alto; i++)
-		{
+	if (!jugador) {
+		for (int i = 0; i < tablero.alto; i++) {
 			free(tablero.celdas[i]);
 		}
 		free(tablero.celdas);
@@ -362,12 +355,13 @@ void imprimirTablero()
 	jugador->x = 2;
 	jugador->y = 3;
 
-	tablero_imprimir(NULL, &tablero, jugador);
+	juego_t juego = { .jugador = jugador, .tablero = &tablero };
+
+	tablero_imprimir(&juego);
 
 	pa2m_afirmar(true, "Puedo imprimir el tablero");
 
-	for (int i = 0; i < tablero.alto; i++)
-	{
+	for (int i = 0; i < tablero.alto; i++) {
 		free(tablero.celdas[i]);
 	}
 	free(tablero.celdas);
@@ -402,9 +396,7 @@ void crearJugadorConUltimoPokemonCazado()
 {
 	jugador_t *jugador = jugador_crear();
 
-	jugador->atrapados = pila_crear();
-
-	pokedex_t *pokedex = pokedex_crear();
+	Lista *pokedex = pokedex_crear();
 
 	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
 
@@ -440,7 +432,8 @@ void crearJugadorConUltimoPokemonCazado()
 
 	pokemon_atrapado->puntaje = pokemon->puntaje;
 
-	pokemon_atrapado->movimientos = malloc(strlen(pokemon->movimientos) + 1);
+	pokemon_atrapado->movimientos =
+		malloc(strlen(pokemon->movimientos) + 1);
 	if (!pokemon_atrapado->movimientos) {
 		free(pokemon_atrapado->color);
 		free(pokemon_atrapado->nombre);
@@ -451,12 +444,13 @@ void crearJugadorConUltimoPokemonCazado()
 	}
 	strcpy(pokemon_atrapado->movimientos, pokemon->movimientos);
 
+	pila_apilar(jugador->rachaActual, pokemon_atrapado);
 
-	pila_apilar(jugador->atrapados, pokemon_atrapado);
+	pa2m_afirmar(jugador->rachaActual != NULL,
+		     "El jugador tiene pokemones atrapados");
 
-	pa2m_afirmar(jugador->atrapados != NULL, "El jugador tiene pokemones atrapados");
-
-	pa2m_afirmar(pila_cantidad(jugador->atrapados) == 1, "El jugador tiene 1 pokemon atrapado");
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1,
+		     "El jugador tiene 1 pokemon atrapado");
 
 	pokedex_destruir_todo(pokedex, destructor_pokemones);
 
@@ -467,18 +461,15 @@ void crearJugadorConMuchosPokemones()
 {
 	jugador_t *jugador = jugador_crear();
 
-	jugador->atrapados = pila_crear();
-
-	pokedex_t *pokedex = pokedex_crear();
+	Lista *pokedex = pokedex_crear();
 
 	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
 
-	for (size_t i = 0; i < pokedex_cantidad(pokedex); i++)
-	{
+	for (size_t i = 0; i < pokedex_cantidad(pokedex); i++) {
 		pokemon_t *pokemon = pokedex_obtener_pokemon(pokedex, i);
-		pokemonTablero_t *pokemon_atrapado = malloc(sizeof(pokemonTablero_t));
-		if (!pokemon_atrapado)
-		{
+		pokemonTablero_t *pokemon_atrapado =
+			malloc(sizeof(pokemonTablero_t));
+		if (!pokemon_atrapado) {
 			pokedex_destruir_todo(pokedex, destructor_pokemones);
 			jugador_destruir(jugador, destructor_pokemones_tablero);
 			return;
@@ -488,8 +479,7 @@ void crearJugadorConMuchosPokemones()
 		pokemon_atrapado->y = (size_t)rand() % ALTO_TABLERO;
 
 		pokemon_atrapado->nombre = malloc(strlen(pokemon->nombre) + 1);
-		if (!pokemon_atrapado->nombre)
-		{
+		if (!pokemon_atrapado->nombre) {
 			free(pokemon_atrapado);
 			pokedex_destruir_todo(pokedex, destructor_pokemones);
 			jugador_destruir(jugador, destructor_pokemones_tablero);
@@ -498,8 +488,7 @@ void crearJugadorConMuchosPokemones()
 		strcpy(pokemon_atrapado->nombre, pokemon->nombre);
 
 		pokemon_atrapado->color = malloc(strlen(pokemon->color) + 1);
-		if (!pokemon_atrapado->color)
-		{
+		if (!pokemon_atrapado->color) {
 			free(pokemon_atrapado->nombre);
 			free(pokemon_atrapado);
 			pokedex_destruir_todo(pokedex, destructor_pokemones);
@@ -510,9 +499,9 @@ void crearJugadorConMuchosPokemones()
 
 		pokemon_atrapado->puntaje = pokemon->puntaje;
 
-		pokemon_atrapado->movimientos = malloc(strlen(pokemon->movimientos) + 1);
-		if (!pokemon_atrapado->movimientos)
-		{
+		pokemon_atrapado->movimientos =
+			malloc(strlen(pokemon->movimientos) + 1);
+		if (!pokemon_atrapado->movimientos) {
 			free(pokemon_atrapado->color);
 			free(pokemon_atrapado->nombre);
 			free(pokemon_atrapado);
@@ -522,16 +511,19 @@ void crearJugadorConMuchosPokemones()
 		}
 		strcpy(pokemon_atrapado->movimientos, pokemon->movimientos);
 
-		pila_apilar(jugador->atrapados, pokemon_atrapado);
+		pila_apilar(jugador->rachaActual, pokemon_atrapado);
 	}
 
-	pa2m_afirmar(jugador->atrapados != NULL, "El jugador tiene pokemones atrapados");
+	pa2m_afirmar(jugador->rachaActual != NULL,
+		     "El jugador tiene pokemones atrapados");
 
-	pa2m_afirmar(pila_cantidad(jugador->atrapados) == 10, "El jugador tiene 10 pokemones atrapados");
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 10,
+		     "El jugador tiene 10 pokemones atrapados");
 
-	pokemonTablero_t *atrapado = pila_desapilar(jugador->atrapados);
+	pokemonTablero_t *atrapado = pila_desapilar(jugador->rachaActual);
 
-	pa2m_afirmar(strcmp(atrapado->nombre, "Galvantula") == 0, "El pokemon atrapado es Bulbasaur");
+	pa2m_afirmar(strcmp(atrapado->nombre, "Galvantula") == 0,
+		     "El pokemon atrapado es Bulbasaur");
 
 	pokedex_destruir_todo(pokedex, destructor_pokemones);
 
@@ -553,10 +545,11 @@ void jugadorMueveArriba()
 
 	pa2m_afirmar(jugador->x == 3, "El jugador esta en la posicion x = 3");
 
-	procesar_entrada(TECLA_ARRIBA, tablero, jugador);
+	procesar_entrada(TECLA_ARRIBA, jugador, tablero->pokemones);
 
-	pa2m_afirmar(jugador->x = 2, "El jugador se movio para arriba, esta en x = 2");
-	
+	pa2m_afirmar(jugador->x = 2,
+		     "El jugador se movio para arriba, esta en x = 2");
+
 	jugador_destruir(jugador, NULL);
 
 	tablero_destruir(tablero, NULL);
@@ -572,10 +565,11 @@ void jugadorMueveAbajo()
 
 	pa2m_afirmar(jugador->x == 3, "El jugador esta en la posicion x = 3");
 
-	procesar_entrada(TECLA_ABAJO, tablero, jugador);
+	procesar_entrada(TECLA_ABAJO, jugador, tablero->pokemones);
 
-	pa2m_afirmar(jugador->x = 4, "El jugador se movio para arriba, esta en x = 4");
-	
+	pa2m_afirmar(jugador->x = 4,
+		     "El jugador se movio para arriba, esta en x = 4");
+
 	jugador_destruir(jugador, NULL);
 
 	tablero_destruir(tablero, NULL);
@@ -591,10 +585,11 @@ void jugadorMueveDerecha()
 
 	pa2m_afirmar(jugador->y == 3, "El jugador esta en la posicion y = 3");
 
-	procesar_entrada(TECLA_DERECHA, tablero, jugador);
+	procesar_entrada(TECLA_DERECHA, jugador, tablero->pokemones);
 
-	pa2m_afirmar(jugador->y = 4, "El jugador se movio para arriba, esta en y = 4");
-	
+	pa2m_afirmar(jugador->y = 4,
+		     "El jugador se movio para arriba, esta en y = 4");
+
 	jugador_destruir(jugador, NULL);
 
 	tablero_destruir(tablero, NULL);
@@ -610,10 +605,11 @@ void jugadorMueveIzquierda()
 
 	pa2m_afirmar(jugador->y == 3, "El jugador esta en la posicion y = 3");
 
-	procesar_entrada(TECLA_DERECHA, tablero, jugador);
+	procesar_entrada(TECLA_DERECHA, jugador, tablero->pokemones);
 
-	pa2m_afirmar(jugador->y = 2, "El jugador se movio para arriba, esta en y = 2");
-	
+	pa2m_afirmar(jugador->y = 2,
+		     "El jugador se movio para arriba, esta en y = 2");
+
 	jugador_destruir(jugador, NULL);
 
 	tablero_destruir(tablero, NULL);
@@ -621,28 +617,28 @@ void jugadorMueveIzquierda()
 
 int main()
 {
-	// pa2m_nuevo_grupo("Pruebas de menu");
-	// crearMenu();
-	// printf("\n");
-	// agregarOpciones();
-	// printf("\n");
-	// elegirOpcion();
-	// printf("\n");
-	// mostrarMenu();
-	// printf("\n");
-	// seleccionarOpcion();
-	// pa2m_nuevo_grupo("Pruebas de pokedex");
-	// crearPokedex();
-	// printf("\n");
-	// agregarPokemones();
-	// printf("\n");
-	// mostrarPokemones();
-	// printf("\n");
-	// obtenerPokemonAleatorio();
-	// printf("\n");
-	// obtenerSietePokemonesAleatorios();
-	// printf("\n");
-	// menuMostrarPokedex();
+	pa2m_nuevo_grupo("Pruebas de menu");
+	crearMenu();
+	printf("\n");
+	agregarOpciones();
+	printf("\n");
+	elegirOpcion();
+	printf("\n");
+	mostrarMenu();
+	printf("\n");
+	seleccionarOpcion();
+	pa2m_nuevo_grupo("Pruebas de pokedex");
+	crearPokedex();
+	printf("\n");
+	agregarPokemones();
+	printf("\n");
+	mostrarPokemones();
+	printf("\n");
+	obtenerPokemonAleatorio();
+	printf("\n");
+	obtenerSietePokemonesAleatorios();
+	printf("\n");
+	menuMostrarPokedex();
 	pa2m_nuevo_grupo("Pruebas de juego");
 	crearTableroConListaNula();
 	printf("\n");
@@ -664,9 +660,7 @@ int main()
 	printf("\n");
 	jugadorMueveDerecha();
 	printf("\n");
-	jugadorMueveIzquierda();	
-
-
+	jugadorMueveIzquierda();
 
 	return pa2m_mostrar_reporte();
 }
