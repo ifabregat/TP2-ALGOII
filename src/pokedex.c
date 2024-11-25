@@ -5,7 +5,6 @@ Lista *pokedex_crear()
 	Lista *pokedex = lista_crear();
 	if (!pokedex)
 		return NULL;
-	
 
 	return pokedex;
 }
@@ -206,8 +205,7 @@ void pokedex_ordenar(Lista *pokedex, int (*comparador)(void *, void *))
 	for (size_t i = 0; i < cantidad - 1; i++) {
 		for (size_t j = 0; j < cantidad - i - 1; j++) {
 			void *elemento_j, *elemento_j1;
-			if (!lista_obtener_elemento(pokedex, j,
-						    &elemento_j) ||
+			if (!lista_obtener_elemento(pokedex, j, &elemento_j) ||
 			    !lista_obtener_elemento(pokedex, j + 1,
 						    &elemento_j1)) {
 				return;
@@ -216,8 +214,7 @@ void pokedex_ordenar(Lista *pokedex, int (*comparador)(void *, void *))
 			if (comparador(elemento_j, elemento_j1) > 0) {
 				void *temp = elemento_j;
 				lista_quitar_elemento(pokedex, j, NULL);
-				lista_agregar_elemento(pokedex,
-						       j + 1, temp);
+				lista_agregar_elemento(pokedex, j + 1, temp);
 			}
 		}
 	}
