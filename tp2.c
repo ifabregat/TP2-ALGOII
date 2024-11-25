@@ -60,9 +60,6 @@ Lista *pokemones_cargar()
 			return NULL;
 		}
 
-		pokemon_lista->x = (size_t)rand() % ANCHO_TABLERO;
-		pokemon_lista->y = (size_t)rand() % ALTO_TABLERO;
-
 		pokemon_lista->nombre = malloc(strlen(pokemon->nombre) + 1);
 		if (!pokemon_lista->nombre) {
 			free(pokemon_lista);
@@ -115,23 +112,13 @@ Lista *pokemones_seleccionar(Lista *pokemones)
 	}
 
 	size_t cantidad_pokemones = lista_cantidad_elementos(pokemones);
-	if (cantidad_pokemones < 7) {
+	if (cantidad_pokemones == 0) {
 		lista_destruir(pokemones_seleccionados);
-		return NULL; // No hay suficientes Pokémon para seleccionar 7
+		return NULL;
 	}
 
-	bool seleccionados[cantidad_pokemones];
-	memset(seleccionados, 0, sizeof(seleccionados));
-
-	size_t seleccionados_count = 0;
-	while (seleccionados_count < 7) {
+	for (size_t i = 0; i < 7; i++) {
 		size_t indice = (size_t)rand() % cantidad_pokemones;
-		if (seleccionados[indice]) {
-			continue; // Ya seleccionado, intenta con otro índice
-		}
-
-		seleccionados[indice] = true;
-		seleccionados_count++;
 
 		pokemonTablero_t *pokemon = NULL;
 		lista_obtener_elemento(pokemones, indice, (void **)&pokemon);
@@ -140,7 +127,6 @@ Lista *pokemones_seleccionar(Lista *pokemones)
 			return NULL;
 		}
 
-		// Crear una copia del Pokémon
 		pokemonTablero_t *pokemon_seleccionado =
 			malloc(sizeof(pokemonTablero_t));
 		if (!pokemon_seleccionado) {
@@ -148,8 +134,8 @@ Lista *pokemones_seleccionar(Lista *pokemones)
 			return NULL;
 		}
 
-		pokemon_seleccionado->x = pokemon->x;
-		pokemon_seleccionado->y = pokemon->y;
+		pokemon_seleccionado->x = (size_t)rand() % ANCHO_TABLERO;
+		pokemon_seleccionado->y = (size_t)rand() % ALTO_TABLERO;
 
 		pokemon_seleccionado->nombre =
 			malloc(strlen(pokemon->nombre) + 1);
@@ -184,7 +170,7 @@ Lista *pokemones_seleccionar(Lista *pokemones)
 		}
 		strcpy(pokemon_seleccionado->movimientos, pokemon->movimientos);
 
-        pokemon_seleccionado->indiceMovimiento = pokemon->indiceMovimiento;
+		pokemon_seleccionado->indiceMovimiento = pokemon->indiceMovimiento;
 
 		lista_agregar_al_final(pokemones_seleccionados,
 				       pokemon_seleccionado);
@@ -193,9 +179,10 @@ Lista *pokemones_seleccionar(Lista *pokemones)
 	return pokemones_seleccionados;
 }
 
+
 int main()
 {
-	srand((unsigned int)time(NULL));
+	srand((unsigned int)1);
 
 	jugador_t *jugador = jugador_crear();
 	if (!jugador) {
