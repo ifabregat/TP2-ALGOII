@@ -701,6 +701,91 @@ void variosPokemonesCazados()
 	jugador_destruir(jugador, NULL);
 }
 
+void eliminarPokemon()
+{
+	jugador_t *jugador = jugador_crear();
+
+	Lista *pokemones = lista_crear();
+
+	pokemonTablero_t pokemon = { .nombre = "Bulbasaur", .color = ANSI_COLOR_BLUE, .letra = 'B', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+
+	lista_agregar_al_final(pokemones, &pokemon);
+
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1, "La lista tiene 1 pokemon");
+
+	void *elemento = NULL;
+
+	lista_obtener_elemento(pokemones, 0, &elemento);
+
+	pa2m_afirmar(elemento == &pokemon, "El pokemon es Bulbasaur");
+
+	printf("\n");
+
+	tablero_eliminar_pokemon(pokemones, &pokemon);
+
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 0, "Se pudo eliminar el pokemon");
+
+	lista_destruir(pokemones);
+
+	jugador_destruir(jugador, NULL);	
+}
+
+void eliminarVariosPokemones()
+{
+	jugador_t *jugador = jugador_crear();
+
+	Lista *pokemones = lista_crear();
+
+	pokemonTablero_t pokemon = { .nombre = "Bulbasaur", .color = ANSI_COLOR_BLUE, .letra = 'B', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+
+	lista_agregar_al_final(pokemones, &pokemon);
+
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1, "La lista tiene 1 pokemon");
+
+	void *elemento = NULL;
+	lista_obtener_elemento(pokemones, 0, &elemento);
+
+	pa2m_afirmar(elemento == &pokemon, "El pokemon es Bulbasaur\n");
+
+	pokemonTablero_t pokemon2 = { .nombre = "Charmander", .color = ANSI_COLOR_RED, .letra = 'C', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+
+	lista_agregar_al_final(pokemones, &pokemon2);
+
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 2, "La lista tiene 2 pokemones");
+
+	lista_obtener_elemento(pokemones, 1, &elemento);
+
+	pa2m_afirmar(elemento == &pokemon2, "El segundo pokemon es Charmander\n");
+
+	lista_agregar_al_final(pokemones, &pokemon2);
+
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 3, "La lista tiene 3 pokemones");
+
+	lista_obtener_elemento(pokemones, 2, &elemento);
+
+	pa2m_afirmar(elemento == &pokemon2, "El tercer pokemon es Charmander");
+
+	printf("\n");
+
+	tablero_eliminar_pokemon(pokemones, &pokemon2);
+
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 2, "Se pudo eliminar el pokemon, la lista tiene 2 pokemones");
+
+	lista_obtener_elemento(pokemones, 0, &elemento);
+
+	pa2m_afirmar(elemento == &pokemon, "El primer pokemon es Bulbasaur");
+
+	lista_obtener_elemento(pokemones, 1, &elemento);
+
+	pa2m_afirmar(elemento == &pokemon2, "El segundo pokemon es Charmander");
+
+	tablero_eliminar_pokemon(pokemones, &pokemon);
+
+	lista_destruir(pokemones);
+
+	jugador_destruir(jugador, NULL);	
+}
+
 int main()
 {
 	pa2m_nuevo_grupo("Pruebas de menu");
@@ -751,6 +836,10 @@ int main()
 	primerPokemonCazado();
 	printf("\n");
 	variosPokemonesCazados();
+	printf("\n");
+	eliminarPokemon();
+	printf("\n");
+	eliminarVariosPokemones();
 
 	return pa2m_mostrar_reporte();
 }
