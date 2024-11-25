@@ -1,39 +1,18 @@
 #include "pokedex.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
-#include "lista.h"
-#include "csv.h"
-#include "../extra/ansi.h"
-
-struct pokedex {
-	Lista *pokemones;
-};
-
-pokedex_t *pokedex_crear()
+Lista *pokedex_crear()
 {
-	pokedex_t *pokedex = malloc(sizeof(pokedex_t));
-
+	Lista *pokedex = lista_crear();
 	if (!pokedex)
 		return NULL;
-
-	pokedex->pokemones = lista_crear();
-
-	if (!pokedex->pokemones) {
-		free(pokedex);
-		return NULL;
-	}
+	
 
 	return pokedex;
 }
 
-void pokedex_destruir_todo(pokedex_t *pokedex, void (*destructor)(void *))
+void pokedex_destruir_todo(Lista *pokedex, void (*destructor)(void *))
 {
-	lista_destruir_todo(pokedex->pokemones, destructor);
-
-	free(pokedex);
+	lista_destruir_todo(pokedex, destructor);
 }
 
 char *obtener_color_ansi(const char *color)
@@ -140,7 +119,7 @@ bool parsear_entero(const char *campo, void *ctx)
 	return sscanf(campo, "%d", numero) == 1;
 }
 
-bool pokedex_agregar_pokemon(pokedex_t *pokedex, char *ruta)
+bool pokedex_agregar_pokemon(Lista *pokedex, char *ruta)
 {
 	struct archivo_csv *archivo = abrir_archivo_csv(ruta, ',');
 
@@ -193,7 +172,7 @@ bool pokedex_agregar_pokemon(pokedex_t *pokedex, char *ruta)
 			return false;
 		}
 
-		lista_agregar_al_final(pokedex->pokemones, pokemon);
+		lista_agregar_al_final(pokedex, pokemon);
 	}
 
 	free(nombre);
@@ -213,13 +192,13 @@ int comparador_nombre_ascendente(void *a, void *b)
 	return strcmp(pokemon_a->nombre, pokemon_b->nombre);
 }
 
-void pokedex_ordenar(pokedex_t *pokedex, int (*comparador)(void *, void *))
+void pokedex_ordenar(Lista *pokedex, int (*comparador)(void *, void *))
 {
-	if (pokedex->pokemones == NULL || comparador == NULL) {
+	if (pokedex == NULL || comparador == NULL) {
 		return;
 	}
 
-	size_t cantidad = lista_cantidad_elementos(pokedex->pokemones);
+	size_t cantidad = lista_cantidad_elementos(pokedex);
 	if (cantidad < 2) {
 		return;
 	}
@@ -227,18 +206,17 @@ void pokedex_ordenar(pokedex_t *pokedex, int (*comparador)(void *, void *))
 	for (size_t i = 0; i < cantidad - 1; i++) {
 		for (size_t j = 0; j < cantidad - i - 1; j++) {
 			void *elemento_j, *elemento_j1;
-			if (!lista_obtener_elemento(pokedex->pokemones, j,
+			if (!lista_obtener_elemento(pokedex, j,
 						    &elemento_j) ||
-			    !lista_obtener_elemento(pokedex->pokemones, j + 1,
+			    !lista_obtener_elemento(pokedex, j + 1,
 						    &elemento_j1)) {
 				return;
 			}
 
 			if (comparador(elemento_j, elemento_j1) > 0) {
 				void *temp = elemento_j;
-				lista_quitar_elemento(pokedex->pokemones, j,
-						      NULL);
-				lista_agregar_elemento(pokedex->pokemones,
+				lista_quitar_elemento(pokedex, j, NULL);
+				lista_agregar_elemento(pokedex,
 						       j + 1, temp);
 			}
 		}
@@ -247,22 +225,22 @@ void pokedex_ordenar(pokedex_t *pokedex, int (*comparador)(void *, void *))
 	return;
 }
 
-size_t pokedex_cantidad(pokedex_t *pokedex)
+size_t pokedex_cantidad(Lista *pokedex)
 {
-	return lista_cantidad_elementos(pokedex->pokemones);
+	return lista_cantidad_elementos(pokedex);
 }
 
-pokemon_t *pokedex_obtener_pokemon(pokedex_t *pokedex, size_t pos)
+pokemon_t *pokedex_obtener_pokemon(Lista *pokedex, size_t pos)
 {
 	void *elemento = NULL;
 
-	if (!lista_obtener_elemento(pokedex->pokemones, pos, &elemento))
+	if (!lista_obtener_elemento(pokedex, pos, &elemento))
 		return NULL;
 
 	return elemento;
 }
 
-pokemon_t *pokedex_obtener_pokemon_random(pokedex_t *pokedex)
+pokemon_t *pokedex_obtener_pokemon_random(Lista *pokedex)
 {
 	size_t cantidad = pokedex_cantidad(pokedex);
 
@@ -273,16 +251,16 @@ pokemon_t *pokedex_obtener_pokemon_random(pokedex_t *pokedex)
 
 	void *elemento = NULL;
 
-	lista_obtener_elemento(pokedex->pokemones, indice, &elemento);
+	lista_obtener_elemento(pokedex, indice, &elemento);
 
 	return elemento;
 }
 
-size_t pokedex_iterar_pokemones(pokedex_t *pokedex,
+size_t pokedex_iterar_pokemones(Lista *pokedex,
 				bool (*funcion)(pokemon_t *, void *), void *ctx)
 {
 	pokedex_ordenar(pokedex, comparador_nombre_ascendente);
 
-	return lista_iterar_elementos(pokedex->pokemones,
+	return lista_iterar_elementos(pokedex,
 				      (bool (*)(void *, void *))funcion, ctx);
 }
