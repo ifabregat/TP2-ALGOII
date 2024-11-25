@@ -97,6 +97,8 @@ Lista *pokemones_cargar()
 		}
 		strcpy(pokemon_lista->movimientos, pokemon->movimientos);
 
+		pokemon_lista->indiceMovimiento = 0;
+
 		lista_agregar_al_final(pokemones, pokemon_lista);
 	}
 
@@ -181,6 +183,8 @@ Lista *pokemones_seleccionar(Lista *pokemones)
 			return NULL;
 		}
 		strcpy(pokemon_seleccionado->movimientos, pokemon->movimientos);
+
+        pokemon_seleccionado->indiceMovimiento = pokemon->indiceMovimiento;
 
 		lista_agregar_al_final(pokemones_seleccionados,
 				       pokemon_seleccionado);
