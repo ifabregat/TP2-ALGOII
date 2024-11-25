@@ -198,25 +198,24 @@ void procesar_movimiento_pokemones(Lista *pokemones, int entrada)
 		char movimiento =
 			pokemon->movimientos[pokemon->indiceMovimiento];
 
-		// Procesar el movimiento del Pokémon
 		switch (movimiento) {
-		case 'N': // Movimiento hacia arriba
+		case 'N':
 			pokemon->y = max(0, pokemon->y - 1);
 			break;
 
-		case 'S': // Movimiento hacia abajo
+		case 'S':
 			pokemon->y = min(ALTO_TABLERO - 1, pokemon->y + 1);
 			break;
 
-		case 'E': // Movimiento hacia la derecha
+		case 'E':
 			pokemon->x = min(ANCHO_TABLERO - 1, pokemon->x + 1);
 			break;
 
-		case 'O': // Movimiento hacia la izquierda
+		case 'O':
 			pokemon->x = max(0, pokemon->x - 1);
 			break;
 
-		case 'J': // Mismo movimiento que el jugador
+		case 'J':
 			switch (entrada) {
 			case TECLA_ARRIBA:
 				pokemon->y = max(0, pokemon->y - 1);
@@ -235,7 +234,7 @@ void procesar_movimiento_pokemones(Lista *pokemones, int entrada)
 			}
 			break;
 
-		case 'I': // Movimiento del jugador invertido
+		case 'I':
 			switch (entrada) {
 			case TECLA_ARRIBA:
 				pokemon->y =
@@ -254,28 +253,27 @@ void procesar_movimiento_pokemones(Lista *pokemones, int entrada)
 			}
 			break;
 
-		case 'R': // Movimiento aleatorio
+		case 'R':
 			switch (rand() % 4) {
 			case 0:
-				pokemon->y = max(0, pokemon->y - 1); // Arriba
+				pokemon->y = max(0, pokemon->y - 1);
 				break;
 			case 1:
 				pokemon->y = min(ALTO_TABLERO - 1,
-						 pokemon->y + 1); // Abajo
+						 pokemon->y + 1);
 				break;
 			case 2:
 				pokemon->x = min(ANCHO_TABLERO - 1,
-						 pokemon->x + 1); // Derecha
+						 pokemon->x + 1);
 				break;
 			case 3:
 				pokemon->x =
-					max(0, pokemon->x - 1); // Izquierda
+					max(0, pokemon->x - 1);
 				break;
 			}
 			break;
 
 		default:
-			// Movimiento no válido, ignorar
 			break;
 		}
 
@@ -285,6 +283,52 @@ void procesar_movimiento_pokemones(Lista *pokemones, int entrada)
 	}
 
 	lista_iterador_destruir(iterador);
+}
+
+size_t comparar_rachas(size_t rachaActual, size_t rachaMayor)
+{
+	return rachaActual > rachaMayor ? rachaActual : rachaMayor;
+}
+
+void administrar_puntaje(jugador_t *jugador, pokemonTablero_t *pokemon)
+{
+	if (pila_esta_vacía(jugador->rachaActual))
+	{
+		pila_apilar(jugador->rachaActual, pokemon);
+		jugador->puntaje += pokemon->puntaje;
+		return;
+	}
+
+	pokemonTablero_t *ultimo_pokemon = pila_tope(jugador->rachaActual);
+
+	if (ultimo_pokemon->letra == pokemon->letra || strcmp(ultimo_pokemon->color, pokemon->color) == 0)
+	{
+		pila_apilar(jugador->rachaActual, pokemon);
+		jugador->multiplicador++;
+	}
+	else
+	{
+		size_t comparacion = comparar_rachas(pila_cantidad(jugador->rachaActual), pila_cantidad(jugador->rachaMayor));
+
+		if (comparacion == pila_cantidad(jugador->rachaActual))
+		{
+			pila_destruir_todo(jugador->rachaMayor, destructor_pokemones_tablero);
+			jugador->rachaMayor = pila_crear();
+
+			while (!pila_esta_vacía(jugador->rachaActual))
+			{
+				pokemonTablero_t *pokemon = pila_desapilar(jugador->rachaActual);
+				pila_apilar(jugador->rachaMayor, pokemon);
+			}
+
+		}
+	
+		pila_apilar(jugador->rachaActual, pokemon);
+
+		jugador->multiplicador = 1;
+	}
+
+	jugador->puntaje += pokemon->puntaje * jugador->multiplicador;
 }
 
 void procesar_entrada(int entrada, jugador_t *jugador, Lista *pokemones)
