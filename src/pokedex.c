@@ -254,12 +254,12 @@ size_t pokedex_cantidad(pokedex_t *pokedex)
 
 pokemon_t *pokedex_obtener_pokemon(pokedex_t *pokedex, size_t pos)
 {
-    void *elemento = NULL;
+	void *elemento = NULL;
 
-    if (!lista_obtener_elemento(pokedex->pokemones, pos, &elemento))
-        return NULL;
+	if (!lista_obtener_elemento(pokedex->pokemones, pos, &elemento))
+		return NULL;
 
-    return elemento;
+	return elemento;
 }
 
 pokemon_t *pokedex_obtener_pokemon_random(pokedex_t *pokedex)
