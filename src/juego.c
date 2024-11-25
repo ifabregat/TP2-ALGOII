@@ -136,6 +136,30 @@ void tablero_imprimir(juego_t *juego)
 	       ANSI_COLOR_RESET);
 }
 
+void tablero_eliminar_pokemon(Lista *pokemones, pokemonTablero_t *pokemon)
+{
+	Lista_iterador *iterador = lista_iterador_crear(pokemones);
+	if (!iterador)
+		return;
+
+	size_t indice = 0;
+
+	while (lista_iterador_hay_siguiente(iterador))
+	{
+		pokemonTablero_t *pokemon_actual = lista_iterador_obtener_elemento_actual(iterador);
+		if (pokemon_actual == pokemon)
+		{
+			lista_quitar_elemento(pokemones, indice, NULL);
+			break;
+		}
+
+		lista_iterador_avanzar(iterador);
+		indice++;
+	}
+
+	lista_iterador_destruir(iterador);
+}
+
 jugador_t *jugador_crear()
 {
 	jugador_t *jugador = malloc(sizeof(jugador_t));

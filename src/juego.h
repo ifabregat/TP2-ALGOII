@@ -86,6 +86,16 @@ pokemonTablero_t *encontrar_pokemon_en_posicion(Lista *pokemones, int x, int y);
 void tablero_imprimir(juego_t *juego);
 
 /*
+* Itera con el iterador interno la lista de pokemones hasta encontrar el pokemon y eliminarlo.
+*/
+void tablero_eliminar_pokemon(Lista *pokemones, pokemonTablero_t *pokemon);
+
+/*
+* Busca un pokemon aleatorio de la pokedex y lo agrega a la lista de pokemones.
+*/
+void tablero_agregar_pokemon(Lista *pokedex, Lista *pokemones);
+
+/*
 * Devuelve el pokemon en la posición x = 0 e y = 0.
 */
 jugador_t *jugador_crear();
