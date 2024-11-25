@@ -56,6 +56,11 @@ typedef struct juego {
 } juego_t;
 
 /*
+* Destruye un pokemonTablero.
+*/
+void destructor_pokemones_tablero(void *elemento);
+
+/*
 * Crea un tablero con las dimensiones de 15 filas y 32 columnas.
 * Se encarga de asignar memoria a los elementos que sean necesarios y asigna el puntero a lista pasada por parametro.
 * Si todo salio bien devuelve el tablero, sino devuelve NULL.
@@ -67,6 +72,12 @@ tablero_t *tablero_crear(Lista *pokemones);
 * Se llama a la funcion de lista_destruir_todo para liberar la memoria de los pokemones.
 */
 void tablero_destruir(tablero_t *tablero, void (*destructor)(void *));
+
+/*
+* Itera con el iterador interno la lista de pokemones hasta encontrar uno que coinicida con la posicion x e y.
+* Devuelve el pokemon encontrado, caso contrario NULL.
+*/
+pokemonTablero_t *encontrar_pokemon_en_posicion(Lista *pokemones, int x, int y);
 
 /*
 * Imprime el tablero con la informacion en pantalla.
@@ -93,7 +104,14 @@ int max(int a, int b);
 int min(int a, int b);
 
 /*
-* Realizar que el jugador y pokemones se muevan.
+* Itera con el iterador interno la lista de pokemones y se encarga de moverlos segun el movimiento que le toca del patron.
+* Si el pokemon llega al final del patron, se reinicia el indice de movimiento.
+*/
+void procesar_movimiento_pokemones(Lista *pokemones, int entrada);
+
+/*
+* Realiza mediante la entrada el moviente del jugador.
+* Se encarga de llamar a la funcion de procesar_movimiento_pokemones para calcular el movimiento de estos.
 */
 void procesar_entrada(int entrada, jugador_t *jugador, Lista *pokemones);
 
