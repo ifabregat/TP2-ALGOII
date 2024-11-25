@@ -34,7 +34,8 @@ typedef struct jugador {
 	int multiplicador;
 	int movimientos;
 	int pokemonesAtrapados;
-	Pila *atrapados;
+	Pila *rachaActual;
+	Pila *rachaMayor;
 } jugador_t;
 
 typedef struct tablero {
@@ -68,9 +69,9 @@ void tablero_destruir(tablero_t *tablero, void (*destructor)(void *));
 
 /*
 * Imprime el tablero con la informacion en pantalla.
-* Esta informacion esta relacionada al juego, los pokemones y al jugador.
+* Esta informacion esta relacionada la contiene juego.
 */
-void tablero_imprimir(juego_t *juego, tablero_t *tablero, jugador_t *jugador);
+void tablero_imprimir(juego_t *juego);
 
 /*
 * Devuelve el pokemon en la posición x = 0 e y = 0.
@@ -93,12 +94,16 @@ int min(int a, int b);
 /*
 * Realizar que el jugador y pokemones se muevan.
 */
-void procesar_entrada(int entrada, tablero_t *tablero, jugador_t *jugador);
+void procesar_entrada(int entrada, jugador_t *jugador, Lista *pokemones);
 
 /*
 * Realiza las operaciones relacionadas al puntaje.
 */
 void administrar_puntaje(jugador_t *jugador, pokemonTablero_t *pokemon);
 
+/*
+* Contiene la logica del juego.
+*/
+int logica(int entrada, void *data);
 
 #endif // JUEGO_H
