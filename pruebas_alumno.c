@@ -36,14 +36,18 @@ void agregarOpciones()
 	menu_destruir(menu, destructor);
 }
 
-void imprimirA()
+bool imprimirA()
 {
 	printf("Opcion a\n");
+
+	return true;
 }
 
-void imprimirB()
+bool imprimirB()
 {
 	printf("Opcion b\n");
+
+	return true;
 }
 
 void elegirOpcion()
@@ -56,9 +60,9 @@ void elegirOpcion()
 	menu_agregar_opcion(menu, 'a', descripcion, imprimirA);
 	menu_agregar_opcion(menu, 'b', descripcion2, imprimirB);
 
-	pa2m_afirmar(menu_ejecutar_opcion(menu, 'a'),
+	pa2m_afirmar(menu_ejecutar_opcion(menu, 'a', NULL),
 		     "Puedo elegir la opcion a");
-	pa2m_afirmar(menu_ejecutar_opcion(menu, 'b'),
+	pa2m_afirmar(menu_ejecutar_opcion(menu, 'b', NULL),
 		     "Puedo elegir la opcion b");
 
 	menu_destruir(menu, destructor);
@@ -98,7 +102,7 @@ void seleccionarOpcion()
 	if (scanf("%c", &opcion) != 1)
 		printf("Error al leer la opcion\n");
 
-	menu_ejecutar_opcion(menu, opcion);
+	menu_ejecutar_opcion(menu, opcion, NULL);
 
 	menu_destruir(menu, destructor);
 }
@@ -180,7 +184,7 @@ bool imprimir_pokemon(pokemon_t *pokemon, void *ctx)
 	return true;
 }
 
-void mostrarPokemones()
+bool mostrarPokemones()
 {
 	Lista *pokedex = pokedex_crear();
 
@@ -189,6 +193,8 @@ void mostrarPokemones()
 	pokedex_iterar_pokemones(pokedex, imprimir_pokemon, NULL);
 
 	pokedex_destruir_todo(pokedex, destructor_pokemones);
+
+	return true;
 }
 
 void menuMostrarPokedex()
@@ -208,7 +214,7 @@ void menuMostrarPokedex()
 
 	printf("\n");
 
-	menu_ejecutar_opcion(menu, opcion);
+	menu_ejecutar_opcion(menu, opcion, NULL);
 
 	menu_destruir(menu, destructor);
 }
