@@ -48,9 +48,15 @@ void tablero_destruir(tablero_t *tablero, void (*destructor)(void *))
 
 	free(tablero->celdas);
 
-	lista_destruir_todo(tablero->pokemones, destructor);
+	if (lista_cantidad_elementos(tablero->pokemones) > 0)
+		lista_destruir_todo(tablero->pokemones, destructor);
+	else
+		lista_destruir(tablero->pokemones);
 
-	lista_destruir_todo(tablero->atrapados, destructor);
+	if (lista_cantidad_elementos(tablero->atrapados) > 0)
+		lista_destruir_todo(tablero->atrapados, destructor);
+	else
+		lista_destruir(tablero->atrapados);
 
 	free(tablero);
 }
@@ -78,14 +84,14 @@ pokemonTablero_t *encontrar_pokemon_en_posicion(Lista *pokemones, int x, int y)
 void tablero_imprimir(juego_t *juego)
 {
 	printf("⏰%s%s%d%s  ", ANSI_COLOR_BOLD, ANSI_COLOR_WHITE,
-	       20 - juego->iteraciones / 5, ANSI_COLOR_RESET);
+	       60 - juego->iteraciones / 5, ANSI_COLOR_RESET);
 	printf("👣%s%s%d%s  ", ANSI_COLOR_BOLD, ANSI_COLOR_WHITE,
 	       juego->jugador->movimientos, ANSI_COLOR_RESET);
 	printf("🐍%s%s%d%s  ", ANSI_COLOR_BOLD, ANSI_COLOR_WHITE,
 	       juego->jugador->pokemonesAtrapados, ANSI_COLOR_RESET);
 	printf("🏆%s%s%d%s ", ANSI_COLOR_BOLD, ANSI_COLOR_YELLOW,
 	       juego->jugador->puntaje, ANSI_COLOR_RESET);
-	printf("%s%s(x%d)%s", ANSI_COLOR_BOLD, ANSI_COLOR_WHITE,
+	printf("🔥%s%s(x%d)%s", ANSI_COLOR_BOLD, ANSI_COLOR_WHITE,
 	       juego->jugador->multiplicador, ANSI_COLOR_RESET);
 
 	printf("\n");
@@ -138,24 +144,34 @@ void tablero_imprimir(juego_t *juego)
 
 	printf("%s%s🌱 %d%s", ANSI_COLOR_BOLD, ANSI_COLOR_WHITE, juego->semilla,
 	       ANSI_COLOR_RESET);
+
+	printf("\n");
+
+	if (juego->jugador->pokemonAtrapado) {
+		printf("Ultimo pokemon atrapado: %s%s%s\n",
+		       juego->jugador->pokemonAtrapado->color,
+		       juego->jugador->pokemonAtrapado->nombre,
+		       ANSI_COLOR_RESET);
+	}
 }
 
-void tablero_eliminar_pokemon(Lista *pokemones, Lista *atrapados, pokemonTablero_t *pokemon)
+pokemonTablero_t *tablero_eliminar_pokemon(Lista *pokemones, Lista *atrapados,
+					   pokemonTablero_t *pokemon)
 {
 	Lista_iterador *iterador = lista_iterador_crear(pokemones);
 	if (!iterador)
-		return;
+		return NULL;
 
 	size_t indice = 0;
+
+	pokemonTablero_t *pokemon_atrapado = NULL;
 
 	while (lista_iterador_hay_siguiente(iterador)) {
 		pokemonTablero_t *pokemon_actual =
 			lista_iterador_obtener_elemento_actual(iterador);
-		pokemonTablero_t *pokemon_atrapado = NULL;
 
 		if (pokemon_actual == pokemon) {
-			lista_agregar_al_final(atrapados,
-					       pokemon_actual);
+			lista_agregar_al_final(atrapados, pokemon_actual);
 			lista_quitar_elemento(pokemones, indice,
 					      (void **)&pokemon_atrapado);
 			break;
@@ -166,6 +182,8 @@ void tablero_eliminar_pokemon(Lista *pokemones, Lista *atrapados, pokemonTablero
 	}
 
 	lista_iterador_destruir(iterador);
+
+	return pokemon_atrapado;
 }
 
 void tablero_agregar_pokemon(Lista *pokedex, Lista *pokemones)
@@ -178,8 +196,8 @@ void tablero_agregar_pokemon(Lista *pokedex, Lista *pokemones)
 	size_t indice = (size_t)rand() % cantidad_pokemones;
 
 	pokemonTablero_t *pokemon = NULL;
-	lista_obtener_elemento(pokemones, indice, (void **)&pokemon);
-	if (!pokemon) {
+	if (!lista_obtener_elemento(pokedex, indice, (void **)&pokemon) ||
+	    !pokemon) {
 		return;
 	}
 
@@ -191,18 +209,21 @@ void tablero_agregar_pokemon(Lista *pokedex, Lista *pokemones)
 
 	pokemon_seleccionado->x = (size_t)rand() % ANCHO_TABLERO;
 	pokemon_seleccionado->y = (size_t)rand() % ALTO_TABLERO;
+	pokemon_seleccionado->nombre = NULL;
+	pokemon_seleccionado->color = NULL;
+	pokemon_seleccionado->movimientos = NULL;
 
 	pokemon_seleccionado->nombre = malloc(strlen(pokemon->nombre) + 1);
 	if (!pokemon_seleccionado->nombre) {
+		free(pokemon_seleccionado);
 		return;
 	}
 	strcpy(pokemon_seleccionado->nombre, pokemon->nombre);
 
-	pokemon_seleccionado->letra = pokemon->letra;
-	pokemon_seleccionado->puntaje = pokemon->puntaje;
-
 	pokemon_seleccionado->color = malloc(strlen(pokemon->color) + 1);
 	if (!pokemon_seleccionado->color) {
+		free(pokemon_seleccionado->nombre);
+		free(pokemon_seleccionado);
 		return;
 	}
 	strcpy(pokemon_seleccionado->color, pokemon->color);
@@ -210,10 +231,15 @@ void tablero_agregar_pokemon(Lista *pokedex, Lista *pokemones)
 	pokemon_seleccionado->movimientos =
 		malloc(strlen(pokemon->movimientos) + 1);
 	if (!pokemon_seleccionado->movimientos) {
+		free(pokemon_seleccionado->color);
+		free(pokemon_seleccionado->nombre);
+		free(pokemon_seleccionado);
 		return;
 	}
 	strcpy(pokemon_seleccionado->movimientos, pokemon->movimientos);
 
+	pokemon_seleccionado->letra = pokemon->letra;
+	pokemon_seleccionado->puntaje = pokemon->puntaje;
 	pokemon_seleccionado->indiceMovimiento = pokemon->indiceMovimiento;
 
 	lista_agregar_al_final(pokemones, pokemon_seleccionado);
@@ -231,6 +257,7 @@ jugador_t *jugador_crear()
 	jugador->multiplicador = 1;
 	jugador->movimientos = 0;
 	jugador->pokemonesAtrapados = 0;
+	jugador->pokemonAtrapado = NULL;
 	jugador->rachaActual = pila_crear();
 	jugador->rachaMayor = pila_crear();
 
@@ -242,11 +269,15 @@ void jugador_destruir(jugador_t *jugador, void (*destructor)(void *))
 	if (!jugador)
 		return;
 
-	if (jugador->rachaActual)
+	if (pila_esta_vacía(jugador->rachaActual))
 		pila_destruir_todo(jugador->rachaActual, destructor);
+	else
+		pila_destruir(jugador->rachaActual);
 
-	if (jugador->rachaMayor)
+	if (pila_esta_vacía(jugador->rachaMayor))
 		pila_destruir_todo(jugador->rachaMayor, destructor);
+	else
+		pila_destruir(jugador->rachaMayor);
 
 	free(jugador);
 }
@@ -408,30 +439,40 @@ void administrar_puntaje(jugador_t *jugador, pokemonTablero_t *pokemon)
 
 	if (ultimo_pokemon->letra == pokemon->letra ||
 	    strcmp(ultimo_pokemon->color, pokemon->color) == 0) {
+		// El Pokémon pertenece a la racha actual
 		pila_apilar(jugador->rachaActual, pokemon);
 		jugador->multiplicador++;
 	} else {
+		// El Pokémon no pertenece a la racha actual, evaluamos la racha mayor
 		size_t comparacion =
 			comparar_rachas(pila_cantidad(jugador->rachaActual),
 					pila_cantidad(jugador->rachaMayor));
 
 		if (comparacion == pila_cantidad(jugador->rachaActual)) {
-			pila_destruir_todo(jugador->rachaMayor,
-					   destructor_pokemones_tablero);
+			// La racha actual es mayor, transferimos los elementos
+			pila_destruir(jugador->rachaMayor);
 			jugador->rachaMayor = pila_crear();
 
 			while (!pila_esta_vacía(jugador->rachaActual)) {
-				pokemonTablero_t *pokemon =
+				pokemonTablero_t *pokemon_transferido =
 					pila_desapilar(jugador->rachaActual);
-				pila_apilar(jugador->rachaMayor, pokemon);
+				pila_apilar(jugador->rachaMayor,
+					    pokemon_transferido);
+			}
+		} else {
+			// La racha actual no es mayor, la vaciamos
+			while (!pila_esta_vacía(jugador->rachaActual)) {
+				pila_desapilar(jugador->rachaActual);
 			}
 		}
 
-		pila_apilar(jugador->rachaActual, pokemon);
-
 		jugador->multiplicador = 1;
+
+		// Nueva racha: apilamos el Pokémon actual
+		pila_apilar(jugador->rachaActual, pokemon);
 	}
 
+	// Actualizamos el puntaje y el último Pokémon atrapado
 	jugador->puntaje += pokemon->puntaje * jugador->multiplicador;
 }
 
@@ -448,12 +489,15 @@ int logica(int entrada, void *datos)
 		juego->jugador->y);
 	if (atrapado) {
 		administrar_puntaje(juego->jugador, atrapado);
-		tablero_eliminar_pokemon(juego->tablero->pokemones, juego->tablero->atrapados, atrapado);
-		// tablero_agregar_pokemon(juego->pokemones, juego->tablero->pokemones);
+		juego->jugador->pokemonAtrapado = tablero_eliminar_pokemon(
+			juego->tablero->pokemones, juego->tablero->atrapados,
+			atrapado);
+		tablero_agregar_pokemon(juego->pokemones,
+					juego->tablero->pokemones);
 		juego->jugador->pokemonesAtrapados++;
 	}
 
-	if (20 - juego->iteraciones / 5 == 0 || entrada == 'q' ||
+	if (60 - juego->iteraciones / 5 == 0 || entrada == 'q' ||
 	    entrada == 'Q')
 		juego->terminado = true;
 

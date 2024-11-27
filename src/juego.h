@@ -35,6 +35,7 @@ typedef struct jugador {
 	int multiplicador;
 	int movimientos;
 	int pokemonesAtrapados;
+	pokemonTablero_t *pokemonAtrapado;
 	Pila *rachaActual;
 	Pila *rachaMayor;
 } jugador_t;
@@ -89,7 +90,7 @@ void tablero_imprimir(juego_t *juego);
 /*
 * Itera con el iterador interno la lista de pokemones hasta encontrar el pokemon y eliminarlo.
 */
-void tablero_eliminar_pokemon(Lista *pokemones, Lista *atrapados, pokemonTablero_t *pokemon);
+pokemonTablero_t *tablero_eliminar_pokemon(Lista *pokemones, Lista *atrapados, pokemonTablero_t *pokemon);
 
 /*
 * Busca un pokemon aleatorio de la pokedex y lo agrega a la lista de pokemones.
@@ -103,7 +104,7 @@ jugador_t *jugador_crear();
 
 /*
 * Destruye el jugador liberando la memoria que se asigno a los elementos.
-* Se llama a la funcion de pila_destruir_todo para liberar la memoria de los pokemones atrapados.
+* Se llama a la funcion de Pila_destruir_todo para liberar la memoria de los pokemones atrapados.
 */
 void jugador_destruir(jugador_t *jugador, void (*destructor)(void *));
 
