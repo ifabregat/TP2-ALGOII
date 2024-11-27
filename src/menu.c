@@ -31,10 +31,28 @@ void menu_destruir(menu_t *menu, void (*destructor)(void *))
 	free(menu);
 }
 
+int comparar_opciones(void *a, void *b)
+{
+	if (!a || !b)
+		return 0;
+
+	char opcion_a = (char)toupper(*(char *)a);
+	char opcion_b = (char)toupper(*(char *)b);
+
+	return opcion_a - opcion_b;
+}
+
 bool menu_agregar_opcion(menu_t *menu, char opcion, char *descripcion,
-			 void (*accion)())
+			 bool (*accion)(void *))
 {
 	if (!menu || !descripcion) {
+		return false;
+	}
+
+	opcion = (char)toupper(opcion);
+
+	if (lista_buscar_elemento(menu->opciones, &opcion, comparar_opciones)) {
+		printf("La opción '%c' ya existe en el menú.\n", opcion);
 		return false;
 	}
 
@@ -43,7 +61,7 @@ bool menu_agregar_opcion(menu_t *menu, char opcion, char *descripcion,
 		return false;
 	}
 
-	item->opcion = (char)toupper(opcion);
+	item->opcion = opcion;
 	item->accion = accion;
 
 	size_t descripcion_len = strlen(descripcion) + 1;
@@ -68,45 +86,36 @@ void menu_mostrar(menu_t *menu)
 {
 	size_t cantidad = lista_cantidad_elementos(menu->opciones);
 
-	printf("Seleccione una opcion: \n");
-
 	for (size_t i = 0; i < cantidad; i++) {
 		menuItem_t *item = NULL;
 
 		lista_obtener_elemento(menu->opciones, i, (void **)&item);
 
-		printf("%s  (%c)%s %s\n", ANSI_COLOR_BOLD, item->opcion,
-		       ANSI_COLOR_RESET, item->descripcion);
+		printf("\n%s                            (%c)%s %s",
+		       ANSI_COLOR_BOLD, item->opcion, ANSI_COLOR_RESET,
+		       item->descripcion);
 	}
-	printf("Ingrese una opcion: ");
+	printf("\nSeleccione una opcion: ");
 }
 
-int comparar_opciones(void *a, void *b)
+bool menu_ejecutar_opcion(menu_t *menu, char opcion, void *contexto)
 {
-	if (!a || !b)
-		return 0;
-
-	return *(char *)a - *(char *)b;
-}
-
-bool menu_ejecutar_opcion(menu_t *menu, char opcion)
-{
-	if (!menu)
+	if (!menu || !menu->opciones)
 		return false;
-
-	menuItem_t *item = NULL;
 
 	opcion = (char)toupper(opcion);
 
-	item = lista_buscar_elemento(menu->opciones, &opcion,
-				     comparar_opciones);
+	menuItem_t *item = lista_buscar_elemento(menu->opciones, &opcion,
+						 comparar_opciones);
 
 	if (!item) {
-		printf("Opcion invalida\n");
+		printf("Opción inválida. Intente de nuevo.\n");
 		return false;
 	}
 
-	item->accion();
+	if (item->accion) {
+		return item->accion(contexto);
+	}
 
-	return true;
+	return false;
 }
