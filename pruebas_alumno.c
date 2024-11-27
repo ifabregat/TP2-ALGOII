@@ -4,24 +4,6 @@
 #include "./src/pokedex.h"
 #include "./src/juego.h"
 #include <stdlib.h>
-#include <time.h>
-
-void destructor(void *elemento)
-{
-	menuItem_t *opcion = (menuItem_t *)elemento;
-	free(opcion->descripcion);
-	free(opcion);
-}
-
-void imprimirA()
-{
-	printf("Opcion a\n");
-}
-
-void imprimirB()
-{
-	printf("Opcion b\n");
-}
 
 void crearMenu()
 {
@@ -30,6 +12,13 @@ void crearMenu()
 	pa2m_afirmar(menu != NULL, "Puedo crear un menu");
 
 	menu_destruir(menu, NULL);
+}
+
+void destructor(void *elemento)
+{
+	menuItem_t *opcion = (menuItem_t *)elemento;
+	free(opcion->descripcion);
+	free(opcion);
 }
 
 void agregarOpciones()
@@ -45,6 +34,16 @@ void agregarOpciones()
 		     "Puedo agregar una segunda opcion al menu");
 
 	menu_destruir(menu, destructor);
+}
+
+void imprimirA()
+{
+	printf("Opcion a\n");
+}
+
+void imprimirB()
+{
+	printf("Opcion b\n");
 }
 
 void elegirOpcion()
@@ -96,9 +95,8 @@ void seleccionarOpcion()
 
 	char opcion = 0;
 
-	if (scanf("%c", &opcion) != 1) {
+	if (scanf("%c", &opcion) != 1)
 		printf("Error al leer la opcion\n");
-	}
 
 	menu_ejecutar_opcion(menu, opcion);
 
@@ -130,10 +128,6 @@ void agregarPokemones()
 	pa2m_afirmar(pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv"),
 		     "Puedo agregar pokemones al pokedex");
 
-	size_t cantidad = pokedex_cantidad(pokedex);
-
-	printf("Cantidad de pokemones: %ld\n", cantidad);
-
 	pa2m_afirmar(pokedex_cantidad(pokedex) == 10,
 		     "La cantidad de pokemones es la correcta");
 
@@ -150,9 +144,9 @@ void obtenerPokemonAleatorio()
 
 	pokemon_t *pokemon = pokedex_obtener_pokemon_random(pokedex);
 
-	printf("Pokemon aleatorio: %s\n", pokemon->nombre);
-
 	pa2m_afirmar(pokemon != NULL, "Puedo obtener un pokemon aleatorio");
+
+	printf("Pokemon aleatorio: %s\n", pokemon->nombre);
 
 	pokedex_destruir_todo(pokedex, destructor_pokemones);
 }
@@ -168,7 +162,7 @@ void obtenerSietePokemonesAleatorios()
 	for (int i = 0; i < 7; i++) {
 		pokemon_t *pokemon = pokedex_obtener_pokemon_random(pokedex);
 
-		printf("Pokemon aleatorio: %s\n", pokemon->nombre);
+		printf("Pokemon aleatorio obtenido: %s\n", pokemon->nombre);
 	}
 
 	pokedex_destruir_todo(pokedex, destructor_pokemones);
@@ -192,8 +186,6 @@ void mostrarPokemones()
 
 	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
 
-	printf("\n");
-
 	pokedex_iterar_pokemones(pokedex, imprimir_pokemon, NULL);
 
 	pokedex_destruir_todo(pokedex, destructor_pokemones);
@@ -211,9 +203,10 @@ void menuMostrarPokedex()
 
 	char opcion = 0;
 
-	if (scanf(" %c", &opcion) != 1) {
+	if (scanf(" %c", &opcion) != 1)
 		printf("Error al leer la opcion\n");
-	}
+
+	printf("\n");
 
 	menu_ejecutar_opcion(menu, opcion);
 
@@ -261,43 +254,20 @@ void crearTableroConLista()
 	for (size_t i = 0; i < pokedex_cantidad(pokedex); i++) {
 		pokemon_t *pokemon = pokedex_obtener_pokemon(pokedex, i);
 		pokemon_t *pokemon_copia = malloc(sizeof(pokemon_t));
-		if (!pokemon_copia) {
-			pokedex_destruir_todo(pokedex, destructor_pokemones);
-			lista_destruir(pokemones);
-			return;
-		}
 
 		pokemon_copia->nombre = malloc(strlen(pokemon->nombre) + 1);
-		if (!pokemon_copia->nombre) {
-			free(pokemon_copia);
-			pokedex_destruir_todo(pokedex, destructor_pokemones);
-			lista_destruir(pokemones);
-			return;
-		}
+
 		strcpy(pokemon_copia->nombre, pokemon->nombre);
 
 		pokemon_copia->color = malloc(strlen(pokemon->color) + 1);
-		if (!pokemon_copia->color) {
-			free(pokemon_copia->nombre);
-			free(pokemon_copia);
-			pokedex_destruir_todo(pokedex, destructor_pokemones);
-			lista_destruir(pokemones);
-			return;
-		}
+
 		strcpy(pokemon_copia->color, pokemon->color);
 
 		pokemon_copia->puntaje = pokemon->puntaje;
 
 		pokemon_copia->movimientos =
 			malloc(strlen(pokemon->movimientos) + 1);
-		if (!pokemon_copia->movimientos) {
-			free(pokemon_copia->color);
-			free(pokemon_copia->nombre);
-			free(pokemon_copia);
-			pokedex_destruir_todo(pokedex, destructor_pokemones);
-			lista_destruir(pokemones);
-			return;
-		}
+
 		strcpy(pokemon_copia->movimientos, pokemon->movimientos);
 
 		lista_agregar_al_final(pokemones, pokemon_copia);
@@ -325,32 +295,17 @@ void imprimirTablero()
 	};
 
 	tablero.celdas = malloc((size_t)tablero.alto * (size_t)sizeof(char *));
-	if (!tablero.celdas) {
+	if (!tablero.celdas)
 		return;
-	}
 
 	for (int i = 0; i < tablero.alto; i++) {
 		tablero.celdas[i] =
 			malloc((size_t)tablero.ancho * (size_t)sizeof(char));
-		if (!tablero.celdas[i]) {
-			for (int j = 0; j < i; j++) {
-				free(tablero.celdas[j]);
-			}
-			free(tablero.celdas);
-			return;
-		}
 
 		memset(tablero.celdas[i], ' ', (size_t)tablero.ancho);
 	}
 
 	jugador_t *jugador = jugador_crear();
-	if (!jugador) {
-		for (int i = 0; i < tablero.alto; i++) {
-			free(tablero.celdas[i]);
-		}
-		free(tablero.celdas);
-		return;
-	}
 
 	jugador->x = 2;
 	jugador->y = 3;
@@ -361,12 +316,12 @@ void imprimirTablero()
 
 	pa2m_afirmar(true, "Puedo imprimir el tablero");
 
-	for (int i = 0; i < tablero.alto; i++) {
+	for (int i = 0; i < tablero.alto; i++)
 		free(tablero.celdas[i]);
-	}
+
 	free(tablero.celdas);
 
-	jugador_destruir(jugador, NULL);
+	jugador_destruir(jugador, destructor_pokemones_tablero);
 }
 
 void crearJugador()
@@ -402,46 +357,20 @@ void crearJugadorConUltimoPokemonCazado()
 
 	pokemon_t *pokemon = pokedex_obtener_pokemon(pokedex, 0);
 	pokemonTablero_t *pokemon_atrapado = malloc(sizeof(pokemonTablero_t));
-	if (!pokemon_atrapado) {
-		pokedex_destruir_todo(pokedex, destructor_pokemones);
-		jugador_destruir(jugador, destructor_pokemones_tablero);
-		return;
-	}
 
 	pokemon_atrapado->x = (size_t)rand() % ANCHO_TABLERO;
 	pokemon_atrapado->y = (size_t)rand() % ALTO_TABLERO;
 
 	pokemon_atrapado->nombre = malloc(strlen(pokemon->nombre) + 1);
-	if (!pokemon_atrapado->nombre) {
-		free(pokemon_atrapado);
-		pokedex_destruir_todo(pokedex, destructor_pokemones);
-		jugador_destruir(jugador, destructor_pokemones_tablero);
-		return;
-	}
 	strcpy(pokemon_atrapado->nombre, pokemon->nombre);
 
 	pokemon_atrapado->color = malloc(strlen(pokemon->color) + 1);
-	if (!pokemon_atrapado->color) {
-		free(pokemon_atrapado->nombre);
-		free(pokemon_atrapado);
-		pokedex_destruir_todo(pokedex, destructor_pokemones);
-		jugador_destruir(jugador, destructor_pokemones_tablero);
-		return;
-	}
 	strcpy(pokemon_atrapado->color, pokemon->color);
 
 	pokemon_atrapado->puntaje = pokemon->puntaje;
 
 	pokemon_atrapado->movimientos =
 		malloc(strlen(pokemon->movimientos) + 1);
-	if (!pokemon_atrapado->movimientos) {
-		free(pokemon_atrapado->color);
-		free(pokemon_atrapado->nombre);
-		free(pokemon_atrapado);
-		pokedex_destruir_todo(pokedex, destructor_pokemones);
-		jugador_destruir(jugador, destructor_pokemones_tablero);
-		return;
-	}
 	strcpy(pokemon_atrapado->movimientos, pokemon->movimientos);
 
 	pila_apilar(jugador->rachaActual, pokemon_atrapado);
@@ -452,9 +381,11 @@ void crearJugadorConUltimoPokemonCazado()
 	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1,
 		     "El jugador tiene 1 pokemon atrapado");
 
+	destructor_pokemones_tablero(pokemon_atrapado);
+
 	pokedex_destruir_todo(pokedex, destructor_pokemones);
 
-	jugador_destruir(jugador, destructor_pokemones_tablero);
+	jugador_destruir(jugador, NULL);
 }
 
 void crearJugadorConMuchosPokemones()
@@ -469,46 +400,20 @@ void crearJugadorConMuchosPokemones()
 		pokemon_t *pokemon = pokedex_obtener_pokemon(pokedex, i);
 		pokemonTablero_t *pokemon_atrapado =
 			malloc(sizeof(pokemonTablero_t));
-		if (!pokemon_atrapado) {
-			pokedex_destruir_todo(pokedex, destructor_pokemones);
-			jugador_destruir(jugador, destructor_pokemones_tablero);
-			return;
-		}
 
 		pokemon_atrapado->x = (size_t)rand() % ANCHO_TABLERO;
 		pokemon_atrapado->y = (size_t)rand() % ALTO_TABLERO;
 
 		pokemon_atrapado->nombre = malloc(strlen(pokemon->nombre) + 1);
-		if (!pokemon_atrapado->nombre) {
-			free(pokemon_atrapado);
-			pokedex_destruir_todo(pokedex, destructor_pokemones);
-			jugador_destruir(jugador, destructor_pokemones_tablero);
-			return;
-		}
 		strcpy(pokemon_atrapado->nombre, pokemon->nombre);
 
 		pokemon_atrapado->color = malloc(strlen(pokemon->color) + 1);
-		if (!pokemon_atrapado->color) {
-			free(pokemon_atrapado->nombre);
-			free(pokemon_atrapado);
-			pokedex_destruir_todo(pokedex, destructor_pokemones);
-			jugador_destruir(jugador, destructor_pokemones_tablero);
-			return;
-		}
 		strcpy(pokemon_atrapado->color, pokemon->color);
 
 		pokemon_atrapado->puntaje = pokemon->puntaje;
 
 		pokemon_atrapado->movimientos =
 			malloc(strlen(pokemon->movimientos) + 1);
-		if (!pokemon_atrapado->movimientos) {
-			free(pokemon_atrapado->color);
-			free(pokemon_atrapado->nombre);
-			free(pokemon_atrapado);
-			pokedex_destruir_todo(pokedex, destructor_pokemones);
-			jugador_destruir(jugador, destructor_pokemones_tablero);
-			return;
-		}
 		strcpy(pokemon_atrapado->movimientos, pokemon->movimientos);
 
 		pila_apilar(jugador->rachaActual, pokemon_atrapado);
@@ -523,15 +428,17 @@ void crearJugadorConMuchosPokemones()
 	pokemonTablero_t *atrapado = pila_desapilar(jugador->rachaActual);
 
 	pa2m_afirmar(strcmp(atrapado->nombre, "Galvantula") == 0,
-		     "El pokemon atrapado es Bulbasaur");
+		     "El pokemon atrapado es Galvantula");
+
+	while (pila_cantidad(jugador->rachaActual) > 0) {
+		pokemonTablero_t *pokemon =
+			pila_desapilar(jugador->rachaActual);
+		destructor_pokemones_tablero(pokemon);
+	}
+
+	destructor_pokemones_tablero(atrapado);
 
 	pokedex_destruir_todo(pokedex, destructor_pokemones);
-
-	free(atrapado->nombre);
-	free(atrapado->color);
-	free(atrapado->movimientos);
-	free(atrapado);
-
 	jugador_destruir(jugador, destructor_pokemones_tablero);
 }
 
@@ -619,19 +526,28 @@ void primerPokemonCazado()
 {
 	jugador_t *jugador = jugador_crear();
 
-	pokemonTablero_t pokemon = { .nombre = "Bulbasaur", .color = ANSI_COLOR_BLUE, .letra = 'B', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+	pokemonTablero_t pokemon = { .nombre = "Bulbasaur",
+				     .color = ANSI_COLOR_BLUE,
+				     .letra = 'B',
+				     .puntaje = 10,
+				     .movimientos = "IRJI",
+				     .indiceMovimiento = 0 };
 
 	administrar_puntaje(jugador, &pokemon);
 
-	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon, "El primer pokemon atrapado es Bulbasaur");
+	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon,
+		     "El primer pokemon atrapado es Bulbasaur");
 
 	pa2m_afirmar(jugador->puntaje == 10, "El puntaje del jugador es 10");
 
-	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1, "La racha actual tiene 1 pokemones");
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1,
+		     "La racha actual tiene 1 pokemones");
 
-	pa2m_afirmar(jugador->multiplicador == 1, "El multiplicador del jugador es 1");
+	pa2m_afirmar(jugador->multiplicador == 1,
+		     "El multiplicador del jugador es 1");
 
-	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 0, "La racha mayor tiene 0 pokemones");
+	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 0,
+		     "La racha mayor tiene 0 pokemones");
 
 	jugador_destruir(jugador, NULL);
 }
@@ -640,63 +556,89 @@ void variosPokemonesCazados()
 {
 	jugador_t *jugador = jugador_crear();
 
-	pokemonTablero_t pokemon = { .nombre = "Bulbasaur", .color = ANSI_COLOR_BLUE, .letra = 'B', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+	pokemonTablero_t pokemon = { .nombre = "Bulbasaur",
+				     .color = ANSI_COLOR_BLUE,
+				     .letra = 'B',
+				     .puntaje = 10,
+				     .movimientos = "IRJI",
+				     .indiceMovimiento = 0 };
 
 	administrar_puntaje(jugador, &pokemon);
 
-	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon, "El primer pokemon atrapado es Bulbasaur");
+	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon,
+		     "El primer pokemon atrapado es Bulbasaur");
 
 	pa2m_afirmar(jugador->puntaje == 10, "El puntaje del jugador es 10");
 
-	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1, "La racha actual tiene 1 pokemones");
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1,
+		     "La racha actual tiene 1 pokemones");
 
-	pa2m_afirmar(jugador->multiplicador == 1, "El multiplicador del jugador es 1");
+	pa2m_afirmar(jugador->multiplicador == 1,
+		     "El multiplicador del jugador es 1");
 
-	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 0, "La racha mayor tiene 0 pokemones");
+	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 0,
+		     "La racha mayor tiene 0 pokemones");
 
 	printf("\n");
 
-	pokemonTablero_t pokemon2 = { .nombre = "Charmander", .color = ANSI_COLOR_RED, .letra = 'C', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+	pokemonTablero_t pokemon2 = { .nombre = "Charmander",
+				      .color = ANSI_COLOR_RED,
+				      .letra = 'C',
+				      .puntaje = 10,
+				      .movimientos = "IRJI",
+				      .indiceMovimiento = 0 };
 
 	administrar_puntaje(jugador, &pokemon2);
 
-	pa2m_afirmar(pila_tope(jugador->rachaMayor) == &pokemon, "El segundo pokemon atrapado es Charmander");
+	pa2m_afirmar(pila_tope(jugador->rachaMayor) == &pokemon,
+		     "El segundo pokemon atrapado es Charmander");
 
 	pa2m_afirmar(jugador->puntaje == 20, "El puntaje del jugador es 20");
 
-	pa2m_afirmar(jugador->multiplicador == 1, "El multiplicador del jugador es 1");
+	pa2m_afirmar(jugador->multiplicador == 1,
+		     "El multiplicador del jugador es 1");
 
-	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1, "La racha actual tiene 1 pokemones");
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 1,
+		     "La racha actual tiene 1 pokemones");
 
-	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 1, "La racha mayor tiene 1 pokemones");
+	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 1,
+		     "La racha mayor tiene 1 pokemones");
 
 	printf("\n");
 
 	administrar_puntaje(jugador, &pokemon2);
 
-	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon2, "El tercer pokemon atrapado es Charmander");
+	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon2,
+		     "El tercer pokemon atrapado es Charmander");
 
 	pa2m_afirmar(jugador->puntaje == 40, "El puntaje del jugador es 40");
 
-	pa2m_afirmar(jugador->multiplicador == 2, "El multiplicador del jugador es 2");
+	pa2m_afirmar(jugador->multiplicador == 2,
+		     "El multiplicador del jugador es 2");
 
-	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 2, "La racha actual tiene 2 pokemones");
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 2,
+		     "La racha actual tiene 2 pokemones");
 
-	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 1, "La racha mayor tiene 1 pokemones");
+	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 1,
+		     "La racha mayor tiene 1 pokemones");
 
 	administrar_puntaje(jugador, &pokemon2);
 
 	printf("\n");
 
-	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon2, "El cuarto pokemon atrapado es Charmander");
+	pa2m_afirmar(pila_tope(jugador->rachaActual) == &pokemon2,
+		     "El cuarto pokemon atrapado es Charmander");
 
 	pa2m_afirmar(jugador->puntaje == 70, "El puntaje del jugador es 70");
 
-	pa2m_afirmar(jugador->multiplicador == 3, "El multiplicador del jugador es 3");
+	pa2m_afirmar(jugador->multiplicador == 3,
+		     "El multiplicador del jugador es 3");
 
-	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 3, "La racha actual tiene 3 pokemones");
+	pa2m_afirmar(pila_cantidad(jugador->rachaActual) == 3,
+		     "La racha actual tiene 3 pokemones");
 
-	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 1, "La racha mayor tiene 1 pokemones");
+	pa2m_afirmar(pila_cantidad(jugador->rachaMayor) == 1,
+		     "La racha mayor tiene 1 pokemones");
 
 	jugador_destruir(jugador, NULL);
 }
@@ -707,11 +649,19 @@ void eliminarPokemon()
 
 	Lista *pokemones = lista_crear();
 
-	pokemonTablero_t pokemon = { .nombre = "Bulbasaur", .color = ANSI_COLOR_BLUE, .letra = 'B', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+	Lista *atrapados = lista_crear();
+
+	pokemonTablero_t pokemon = { .nombre = "Bulbasaur",
+				     .color = ANSI_COLOR_BLUE,
+				     .letra = 'B',
+				     .puntaje = 10,
+				     .movimientos = "IRJI",
+				     .indiceMovimiento = 0 };
 
 	lista_agregar_al_final(pokemones, &pokemon);
 
-	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1, "La lista tiene 1 pokemon");
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1,
+		     "La lista tiene 1 pokemon");
 
 	void *elemento = NULL;
 
@@ -721,13 +671,16 @@ void eliminarPokemon()
 
 	printf("\n");
 
-	tablero_eliminar_pokemon(pokemones, &pokemon);
+	tablero_eliminar_pokemon(pokemones, atrapados, &pokemon);
 
-	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 0, "Se pudo eliminar el pokemon");
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 0,
+		     "Se pudo eliminar el pokemon");
 
 	lista_destruir(pokemones);
 
-	jugador_destruir(jugador, NULL);	
+	lista_destruir(atrapados);
+
+	jugador_destruir(jugador, NULL);
 }
 
 void eliminarVariosPokemones()
@@ -736,30 +689,46 @@ void eliminarVariosPokemones()
 
 	Lista *pokemones = lista_crear();
 
-	pokemonTablero_t pokemon = { .nombre = "Bulbasaur", .color = ANSI_COLOR_BLUE, .letra = 'B', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+	Lista *atrapados = lista_crear();
+
+	pokemonTablero_t pokemon = { .nombre = "Bulbasaur",
+				     .color = ANSI_COLOR_BLUE,
+				     .letra = 'B',
+				     .puntaje = 10,
+				     .movimientos = "IRJI",
+				     .indiceMovimiento = 0 };
 
 	lista_agregar_al_final(pokemones, &pokemon);
 
-	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1, "La lista tiene 1 pokemon");
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1,
+		     "La lista tiene 1 pokemon");
 
 	void *elemento = NULL;
 	lista_obtener_elemento(pokemones, 0, &elemento);
 
 	pa2m_afirmar(elemento == &pokemon, "El pokemon es Bulbasaur\n");
 
-	pokemonTablero_t pokemon2 = { .nombre = "Charmander", .color = ANSI_COLOR_RED, .letra = 'C', .puntaje = 10, .movimientos = "IRJI", .indiceMovimiento = 0 };
+	pokemonTablero_t pokemon2 = { .nombre = "Charmander",
+				      .color = ANSI_COLOR_RED,
+				      .letra = 'C',
+				      .puntaje = 10,
+				      .movimientos = "IRJI",
+				      .indiceMovimiento = 0 };
 
 	lista_agregar_al_final(pokemones, &pokemon2);
 
-	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 2, "La lista tiene 2 pokemones");
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 2,
+		     "La lista tiene 2 pokemones");
 
 	lista_obtener_elemento(pokemones, 1, &elemento);
 
-	pa2m_afirmar(elemento == &pokemon2, "El segundo pokemon es Charmander\n");
+	pa2m_afirmar(elemento == &pokemon2,
+		     "El segundo pokemon es Charmander\n");
 
 	lista_agregar_al_final(pokemones, &pokemon2);
 
-	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 3, "La lista tiene 3 pokemones");
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 3,
+		     "La lista tiene 3 pokemones");
 
 	lista_obtener_elemento(pokemones, 2, &elemento);
 
@@ -767,9 +736,10 @@ void eliminarVariosPokemones()
 
 	printf("\n");
 
-	tablero_eliminar_pokemon(pokemones, &pokemon2);
+	tablero_eliminar_pokemon(pokemones, atrapados, &pokemon2);
 
-	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 2, "Se pudo eliminar el pokemon, la lista tiene 2 pokemones");
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 2,
+		     "Se pudo eliminar el pokemon, la lista tiene 2 pokemones");
 
 	lista_obtener_elemento(pokemones, 0, &elemento);
 
@@ -779,11 +749,13 @@ void eliminarVariosPokemones()
 
 	pa2m_afirmar(elemento == &pokemon2, "El segundo pokemon es Charmander");
 
-	tablero_eliminar_pokemon(pokemones, &pokemon);
+	tablero_eliminar_pokemon(pokemones, atrapados, &pokemon);
 
 	lista_destruir(pokemones);
 
-	jugador_destruir(jugador, NULL);	
+	lista_destruir(atrapados);
+
+	jugador_destruir(jugador, NULL);
 }
 
 void agregarUnPokemon()
@@ -791,17 +763,13 @@ void agregarUnPokemon()
 	Lista *pokedex = pokedex_crear();
 
 	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
-	if (pokedex == NULL)
-	{
-		pa2m_afirmar(false, "No se pudo agregar pokemones al pokedex");
-		return;
-	}
 
 	Lista *pokemones = lista_crear();
 
 	tablero_agregar_pokemon(pokedex, pokemones);
 
-	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1, "Se pudo agregar un pokemon al tablero");
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1,
+		     "Se pudo agregar un pokemon al tablero");
 
 	void *elemento = NULL;
 	lista_obtener_elemento(pokemones, 0, &elemento);
@@ -818,17 +786,13 @@ void agregarVariosPokemones()
 	Lista *pokedex = pokedex_crear();
 
 	pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv");
-	if (pokedex == NULL)
-	{
-		pa2m_afirmar(false, "No se pudo agregar pokemones al pokedex");
-		return;
-	}
 
 	Lista *pokemones = lista_crear();
 
 	tablero_agregar_pokemon(pokedex, pokemones);
 
-	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1, "Se pudo agregar un pokemon al tablero");
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 1,
+		     "Se pudo agregar un pokemon al tablero");
 
 	void *elemento = NULL;
 	lista_obtener_elemento(pokemones, 0, &elemento);
@@ -841,7 +805,8 @@ void agregarVariosPokemones()
 
 	tablero_agregar_pokemon(pokedex, pokemones);
 
-	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 2, "Se pudo agregar un segundo pokemon al tablero");
+	pa2m_afirmar(lista_cantidad_elementos(pokemones) == 2,
+		     "Se pudo agregar un segundo pokemon al tablero");
 
 	lista_obtener_elemento(pokemones, 1, &elemento);
 
