@@ -51,7 +51,7 @@ typedef struct tablero {
 typedef struct juego {
 	jugador_t *jugador;
 	tablero_t *tablero;
-	Lista *pokemones;
+	Lista *pokedex;
 	int iteraciones;
 	int semilla;
 	bool terminado;
