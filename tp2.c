@@ -182,7 +182,6 @@ Lista *pokemones_seleccionar(Lista *pokemones)
 		pokemon_seleccionado->indiceMovimiento =
 			pokemon->indiceMovimiento;
 
-		// Añadir el pokemon seleccionado a la lista
 		lista_agregar_al_final(pokemones_seleccionados,
 				       pokemon_seleccionado);
 	}
@@ -198,6 +197,7 @@ void mostrar_resultados(jugador_t *jugador)
 	    pila_cantidad(jugador->rachaActual)) {
 		printf("El multiplicador maximo fue de: 🔥%ld\n",
 		       pila_cantidad(jugador->rachaMayor));
+		printf("La racha mas larga fue de: \n");
 		while (!pila_esta_vacía(jugador->rachaMayor)) {
 			pokemonTablero_t *pokemon =
 				pila_desapilar(jugador->rachaMayor);
@@ -207,8 +207,9 @@ void mostrar_resultados(jugador_t *jugador)
 			       pokemon->puntaje, ANSI_COLOR_RESET);
 		}
 	} else {
-		printf("El multiplicador maximo fue de: %ld\n\n",
+		printf("El multiplicador maximo fue de: %ld\n",
 		       pila_cantidad(jugador->rachaActual));
+		printf("La racha mas larga fue de: \n");
 		while (!pila_esta_vacía(jugador->rachaActual)) {
 			pokemonTablero_t *pokemon =
 				pila_desapilar(jugador->rachaActual);
@@ -237,10 +238,12 @@ bool mostrar_pokemones(pokemon_t *pokemon, void *contexto)
 {
 	if (!pokemon)
 		return false;
-	
-	printf(" %s%s%s, puntaje %s%d%s\n", pokemon->color,
-		       pokemon->nombre, ANSI_COLOR_RESET, ANSI_COLOR_YELLOW,
-		       pokemon->puntaje, ANSI_COLOR_RESET);
+
+	printf("        %s%s•%s %s%s%s%s (%s) -> %s%s%d puntos%s\n",
+	       ANSI_COLOR_BOLD, ANSI_COLOR_WHITE, ANSI_COLOR_RESET,
+	       ANSI_COLOR_BOLD, pokemon->color, pokemon->nombre,
+	       ANSI_COLOR_RESET, pokemon->movimientos, ANSI_COLOR_BOLD,
+	       ANSI_COLOR_WHITE, pokemon->puntaje, ANSI_COLOR_RESET);
 
 	return true;
 }
@@ -258,6 +261,8 @@ bool mostrar_pokedex(void *contexto)
 	}
 
 	pokedex_ordenar(pokedex, comparar_pokemon_nombre);
+
+	printf("\nPokemones en la pokedex:\n");
 
 	pokedex_iterar_pokemones(pokedex, mostrar_pokemones, NULL);
 
@@ -328,11 +333,11 @@ void juego(int semilla)
 
 bool sin_semilla(void *contexto)
 {
-    int semilla = (int)time(NULL);
-    srand((unsigned int)semilla);
+	int semilla = (int)time(NULL);
+	srand((unsigned int)semilla);
 
-    semilla = rand();             
-    srand((unsigned int)semilla);
+	semilla = rand();
+	srand((unsigned int)semilla);
 	juego(semilla);
 
 	*(bool *)contexto = false;
@@ -345,8 +350,7 @@ bool con_semilla(void *contexto)
 	int semilla = 0;
 
 	printf("Ingrese la semilla: ");
-	if (scanf("%d", &semilla) != 1)
-	{
+	if (scanf("%d", &semilla) != 1) {
 		printf("Error al leer la semilla\n");
 		return false;
 	}
@@ -434,8 +438,6 @@ int main()
 		if (scanf(" %c", &opcion) != 1) {
 			printf("Error al leer la opción\n");
 		}
-
-		printf("\n");
 
 		opcion = (char)toupper(opcion);
 

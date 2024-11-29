@@ -140,6 +140,15 @@ void tablero_imprimir(juego_t *juego)
 
 	printf("\n");
 
+	printf("%s%sMovete con: ⬆️ ➡️ ⬇️ ⬅️ %s", ANSI_COLOR_BOLD, ANSI_COLOR_WHITE,
+	       ANSI_COLOR_RESET);
+
+	printf(" %s%sSali con: %s%s%sQ%s", ANSI_COLOR_BOLD, ANSI_COLOR_WHITE,
+	       ANSI_COLOR_RESET, ANSI_COLOR_BOLD, ANSI_COLOR_RED,
+	       ANSI_COLOR_RESET);
+
+	printf("\n");
+
 	if (juego->jugador->pokemonAtrapado) {
 		printf("Ultimo pokemon atrapado: %s%s%s\n",
 		       juego->jugador->pokemonAtrapado->color,
