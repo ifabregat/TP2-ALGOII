@@ -1513,7 +1513,7 @@ int main()
 	printf("\n");
 	mostrarMenu();
 	printf("\n");
-	seleccionarOpcion();
+	//seleccionarOpcion();
 	pa2m_nuevo_grupo("Pruebas de pokedex");
 	crearPokedex();
 	printf("\n");
@@ -1525,7 +1525,7 @@ int main()
 	printf("\n");
 	obtenerSietePokemonesAleatorios();
 	printf("\n");
-	menuMostrarPokedex();
+	//menuMostrarPokedex();
 	pa2m_nuevo_grupo("Pruebas de juego");
 	crearTableroConListaNula();
 	printf("\n");
