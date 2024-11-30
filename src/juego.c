@@ -1,5 +1,28 @@
 #include "juego.h"
 
+void destructor_pokemones_tablero(void *pokemon_void)
+{
+	if (!pokemon_void)
+		return;
+
+	pokemonTablero_t *pokemon = (pokemonTablero_t *)pokemon_void;
+
+	if (pokemon->nombre) {
+		free(pokemon->nombre);
+		pokemon->nombre = NULL;
+	}
+	if (pokemon->color) {
+		free(pokemon->color);
+		pokemon->color = NULL;
+	}
+	if (pokemon->movimientos) {
+		free(pokemon->movimientos);
+		pokemon->movimientos = NULL;
+	}
+
+	free(pokemon);
+}
+
 tablero_t *tablero_crear(Lista *pokemones)
 {
 	tablero_t *tablero = malloc(sizeof(tablero_t));
