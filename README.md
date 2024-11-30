@@ -30,9 +30,12 @@ make tp2
 valgrind --leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2 --show-leak-kinds=all --trace-children=yes ./tp2
 ```
 
-- Para ejecutar pruebas y luego tp2
+- Para ejecutar pruebas* y luego tp2
 ```make
 make
+```
+```text
+* hay dos pruebas que estan comentadas, ya que l bot tiraba time out
 ```
 
 ---
