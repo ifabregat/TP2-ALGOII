@@ -968,20 +968,6 @@ void crearJugador()
 	jugador_destruir(jugador, NULL);
 }
 
-void destructor_pokemones_tablero(void *elemento)
-{
-	if (!elemento)
-		return;
-
-	pokemonTablero_t *pokemon = elemento;
-
-	free(pokemon->nombre);
-	free(pokemon->color);
-	free(pokemon->movimientos);
-
-	free(pokemon);
-}
-
 void crearJugadorConUltimoPokemonCazado()
 {
 	jugador_t *jugador = jugador_crear();
