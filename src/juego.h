@@ -90,7 +90,8 @@ void tablero_imprimir(juego_t *juego);
 /*
 * Itera con el iterador interno la lista de pokemones hasta encontrar el pokemon y eliminarlo.
 */
-pokemonTablero_t *tablero_eliminar_pokemon(Lista *pokemones, Lista *atrapados, pokemonTablero_t *pokemon);
+pokemonTablero_t *tablero_eliminar_pokemon(Lista *pokemones, Lista *atrapados,
+					   pokemonTablero_t *pokemon);
 
 /*
 * Busca un pokemon aleatorio de la pokedex y lo agrega a la lista de pokemones.

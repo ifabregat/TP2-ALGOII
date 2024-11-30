@@ -11,15 +11,14 @@
 #include "lista.h"
 #include "../extra/ansi.h"
 
-typedef struct menuItem
-{
-    char opcion;
-    char *descripcion;
-    bool (*accion)(void *);
+typedef struct menuItem {
+	char opcion;
+	char *descripcion;
+	bool (*accion)(void *);
 } menuItem_t;
 
 typedef struct menu {
-    Lista *opciones;
+	Lista *opciones;
 } menu_t;
 
 /*
@@ -37,7 +36,8 @@ void menu_destruir(menu_t *menu, void (*destructor)(void *));
 * Agrega una opcion al menu.
 * Devuelve true si la opcion fue agregada correctamente, false en caso contrario.
 */
-bool menu_agregar_opcion(menu_t *menu, char opcion, char *descripcion, bool (*accion)(void *));
+bool menu_agregar_opcion(menu_t *menu, char opcion, char *descripcion,
+			 bool (*accion)(void *));
 
 /*
 * Muestra el menu por pantalla.

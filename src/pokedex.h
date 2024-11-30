@@ -12,12 +12,11 @@
 #include "csv.h"
 #include "../extra/ansi.h"
 
-typedef struct pokemon 
-{
-    char *nombre;
-    int puntaje;
-    char *color;
-    char *movimientos;
+typedef struct pokemon {
+	char *nombre;
+	int puntaje;
+	char *color;
+	char *movimientos;
 } pokemon_t;
 
 /*
@@ -63,6 +62,8 @@ pokemon_t *pokedex_obtener_pokemon_random(Lista *pokedex);
 * La funcion se debe invocar a los pokemones ordenados por nombre de manera creciente.
 * Devuelve la cantidad de pokemones que se pudieron recorrer.
 */
-size_t pokedex_iterar_pokemones(Lista *pokedex, bool (*funcion)(pokemon_t *, void *), void *ctx);
+size_t pokedex_iterar_pokemones(Lista *pokedex,
+				bool (*funcion)(pokemon_t *, void *),
+				void *ctx);
 
 #endif // POKEDEX_H
