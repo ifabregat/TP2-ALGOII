@@ -1438,7 +1438,6 @@ void agregarVariosPokemones()
 	pokedex_destruir_todo(pokedex, destructor_pokemones);
 }
 
-
 int main()
 {
 	pa2m_nuevo_grupo("Pruebas de pila");

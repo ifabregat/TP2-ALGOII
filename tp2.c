@@ -180,8 +180,7 @@ void mostrar_resultados(jugador_t *jugador)
 
 	if (pila_cantidad(jugador->rachaMayor) >
 	    pila_cantidad(jugador->rachaActual)) {
-		printf("El multiplicador maximo fue de: 🔥%ld\n",
-		       rachaMayor);
+		printf("El multiplicador maximo fue de: 🔥%ld\n", rachaMayor);
 		printf("La racha mas larga fue de: \n");
 		while (!pila_esta_vacía(jugador->rachaMayor)) {
 			pokemonTablero_t *pokemon =
@@ -192,8 +191,7 @@ void mostrar_resultados(jugador_t *jugador)
 			       pokemon->puntaje, ANSI_COLOR_RESET);
 		}
 	} else {
-		printf("El multiplicador maximo fue de: %ld\n",
-		       rachaActual);
+		printf("El multiplicador maximo fue de: %ld\n", rachaActual);
 		printf("La racha mas larga fue de: \n");
 		while (!pila_esta_vacía(jugador->rachaActual)) {
 			pokemonTablero_t *pokemon =
