@@ -1,12 +1,5 @@
 #include "menu.h"
 
-#include "lista.h"
-#include "../extra/ansi.h"
-
-struct menu {
-	Lista *opciones;
-};
-
 menu_t *menu_crear()
 {
 	menu_t *menu = malloc(sizeof(menu_t));

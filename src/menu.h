@@ -8,6 +8,9 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "lista.h"
+#include "../extra/ansi.h"
+
 typedef struct menuItem
 {
     char opcion;
@@ -15,7 +18,9 @@ typedef struct menuItem
     bool (*accion)(void *);
 } menuItem_t;
 
-typedef struct menu menu_t;
+typedef struct menu {
+    Lista *opciones;
+} menu_t;
 
 /*
 * Crea un nuevo menu.
