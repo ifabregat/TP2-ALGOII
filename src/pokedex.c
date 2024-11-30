@@ -248,7 +248,8 @@ pokemon_t *pokedex_obtener_pokemon_random(Lista *pokedex)
 
 	void *elemento = NULL;
 
-	lista_obtener_elemento(pokedex, indice, &elemento);
+	if (!lista_obtener_elemento(pokedex, indice, &elemento))
+		return NULL;
 
 	return elemento;
 }
