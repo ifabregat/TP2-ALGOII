@@ -16,29 +16,6 @@ void destructor_pokemones(void *elemento)
 	free(pokemon);
 }
 
-void destructor_pokemones_tablero(void *pokemon_void)
-{
-	if (!pokemon_void)
-		return;
-
-	pokemonTablero_t *pokemon = (pokemonTablero_t *)pokemon_void;
-
-	if (pokemon->nombre) {
-		free(pokemon->nombre);
-		pokemon->nombre = NULL;
-	}
-	if (pokemon->color) {
-		free(pokemon->color);
-		pokemon->color = NULL;
-	}
-	if (pokemon->movimientos) {
-		free(pokemon->movimientos);
-		pokemon->movimientos = NULL;
-	}
-
-	free(pokemon);
-}
-
 Lista *pokemones_cargar()
 {
 	Lista *pokemones = lista_crear();
@@ -193,10 +170,18 @@ void mostrar_resultados(jugador_t *jugador)
 {
 	printf("🏆 Puntaje: %d\n", jugador->puntaje);
 
+	size_t rachaActual = pila_cantidad(jugador->rachaActual);
+	if (rachaActual == 0)
+		rachaActual = 1;
+
+	size_t rachaMayor = pila_cantidad(jugador->rachaMayor);
+	if (rachaMayor == 0)
+		rachaMayor = 1;
+
 	if (pila_cantidad(jugador->rachaMayor) >
 	    pila_cantidad(jugador->rachaActual)) {
 		printf("El multiplicador maximo fue de: 🔥%ld\n",
-		       pila_cantidad(jugador->rachaMayor));
+		       rachaMayor);
 		printf("La racha mas larga fue de: \n");
 		while (!pila_esta_vacía(jugador->rachaMayor)) {
 			pokemonTablero_t *pokemon =
@@ -208,7 +193,7 @@ void mostrar_resultados(jugador_t *jugador)
 		}
 	} else {
 		printf("El multiplicador maximo fue de: %ld\n",
-		       pila_cantidad(jugador->rachaActual));
+		       rachaActual);
 		printf("La racha mas larga fue de: \n");
 		while (!pila_esta_vacía(jugador->rachaActual)) {
 			pokemonTablero_t *pokemon =
@@ -221,17 +206,6 @@ void mostrar_resultados(jugador_t *jugador)
 	}
 
 	printf("\n");
-}
-
-int comparar_pokemon_nombre(void *elemento1, void *elemento2)
-{
-	if (!elemento1 || !elemento2)
-		return 0;
-
-	pokemon_t *pokemon1 = (pokemon_t *)elemento1;
-	pokemon_t *pokemon2 = (pokemon_t *)elemento2;
-
-	return strcmp(pokemon1->nombre, pokemon2->nombre);
 }
 
 bool mostrar_pokemones(pokemon_t *pokemon, void *contexto)
@@ -259,8 +233,6 @@ bool mostrar_pokedex(void *contexto)
 		pokedex_destruir_todo(pokedex, destructor_pokemones);
 		return false;
 	}
-
-	pokedex_ordenar(pokedex, comparar_pokemon_nombre);
 
 	printf("\nPokemones en la pokedex:\n");
 
