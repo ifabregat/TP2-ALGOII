@@ -16,7 +16,7 @@ void destructor_pokemones(void *elemento)
 	free(pokemon);
 }
 
-Lista *pokemones_cargar()
+Lista *pokemones_cargar(char *ruta)
 {
 	Lista *pokemones = lista_crear();
 	if (!pokemones) {
@@ -29,7 +29,7 @@ Lista *pokemones_cargar()
 		return NULL;
 	}
 
-	if (!pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv")) {
+	if (!pokedex_agregar_pokemon(pokedex, ruta)) {
 		pokedex_destruir_todo(pokedex, destructor_pokemones);
 		lista_destruir(pokemones);
 		return NULL;
@@ -220,14 +220,14 @@ bool mostrar_pokemones(pokemon_t *pokemon, void *contexto)
 	return true;
 }
 
-bool mostrar_pokedex(void *contexto)
+bool mostrar_pokedex(void *contexto, void *ruta)
 {
 	Lista *pokedex = pokedex_crear();
 	if (!pokedex) {
 		return false;
 	}
 
-	if (!pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv")) {
+	if (!pokedex_agregar_pokemon(pokedex, (char *)ruta)) {
 		pokedex_destruir_todo(pokedex, destructor_pokemones);
 		return false;
 	}
@@ -243,7 +243,7 @@ bool mostrar_pokedex(void *contexto)
 	return true;
 }
 
-void juego(int semilla)
+void juego(int semilla, void *ruta)
 {
 	jugador_t *jugador = jugador_crear();
 	if (!jugador) {
@@ -256,13 +256,13 @@ void juego(int semilla)
 		return;
 	}
 
-	if (!pokedex_agregar_pokemon(pokedex, "datos/pokedex.csv")) {
+	if (!pokedex_agregar_pokemon(pokedex, (char *)ruta)) {
 		pokedex_destruir_todo(pokedex, destructor_pokemones);
 		jugador_destruir(jugador, NULL);
 		return;
 	}
 
-	Lista *pokemones = pokemones_cargar();
+	Lista *pokemones = pokemones_cargar(ruta);
 	if (!pokemones) {
 		jugador_destruir(jugador, NULL);
 		return;
@@ -301,21 +301,21 @@ void juego(int semilla)
 	tablero_destruir(tablero, destructor_pokemones_tablero);
 }
 
-bool sin_semilla(void *contexto)
+bool sin_semilla(void *contexto, void *contexto2)
 {
 	int semilla = (int)time(NULL);
 	srand((unsigned int)semilla);
 
 	semilla = rand();
 	srand((unsigned int)semilla);
-	juego(semilla);
+	juego(semilla, (char *)contexto2);
 
 	*(bool *)contexto = false;
 
 	return true;
 }
 
-bool con_semilla(void *contexto)
+bool con_semilla(void *contexto, void *contexto2)
 {
 	int semilla = 0;
 
@@ -327,14 +327,14 @@ bool con_semilla(void *contexto)
 
 	srand((unsigned int)semilla);
 
-	juego(semilla);
+	juego(semilla, (char *)contexto2);
 
 	*(bool *)contexto = false;
 
 	return true;
 }
 
-bool salir(void *contexto)
+bool salir(void *contexto, void *contexto2)
 {
 	*(bool *)contexto = false;
 
@@ -387,7 +387,7 @@ void mostrar_logo()
 	printf("%s", ANSI_COLOR_RESET);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	borrar_pantalla();
 
@@ -396,6 +396,14 @@ int main()
 		printf("Error: no se pudo crear el menú.\n");
 		return 1;
 	}
+
+	if (argc != 2) {
+		printf("Error: cantidad de argumentos inválida.\n");
+		menu_destruir(menu, menu_destructor);
+		return 1;
+	}
+
+	char *ruta = argv[1];
 
 	mostrar_logo();
 	menu_mostrar(menu);
@@ -411,7 +419,7 @@ int main()
 
 		opcion = (char)toupper(opcion);
 
-		if (menu_ejecutar_opcion(menu, opcion, &continuar) == false) {
+		if (!menu_ejecutar_opcion(menu, opcion, &continuar, ruta)) {
 			borrar_pantalla();
 			mostrar_logo();
 		}
