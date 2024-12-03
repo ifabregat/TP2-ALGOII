@@ -22,12 +22,12 @@ make tp2
 - Para ejecutar:
 
 ```bash
-./tp2
+./tp2 datos/pokedex.csv
 ```
 
 - Para ejecutar con valgrind:
 ```bash
-valgrind --leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2 --show-leak-kinds=all --trace-children=yes ./tp2
+valgrind --leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2 --show-leak-kinds=all --trace-children=yes ./tp2 datos/pokedex.csv
 ```
 
 - Para ejecutar pruebas* y luego tp2
@@ -35,7 +35,7 @@ valgrind --leak-check=full --track-origins=yes --show-reachable=yes --error-exit
 make
 ```
 ```text
-* hay dos pruebas que estan comentadas, ya que l bot tiraba time out
+* hay dos pruebas que estan comentadas, ya que el bot tiraba time out. Fueron hechas para probar que el menu funcionara de forma adecuada.
 ```
 
 ---
@@ -45,7 +45,7 @@ make
 
 ### Estructuras
 
-* **menuItem**: contiene un `char` para la opcion, contiene una `char *` y contiene un puntero a funcion tipo `bool` que recibe como parametro un `void *`.
+* **menuItem**: contiene un `char` para la opcion, contiene una `char *` y contiene un puntero a funcion tipo `bool` que recibe como parametro dos `void *`.
 
 * **menu**: contiene un puntero a un tipo de dato tipo `lista`.
 
@@ -63,7 +63,7 @@ make
 
 * **menu_mostrar**: recibe un puntero al `menu_t` para el menu. Con un for itera hasta el valor retornado por `lista_cantidad_elementos`. En cada iteracion obtiene el elemento `menuItem` de la lista con `lista_obtener_elemento` a traves del indice y lo muestra con determinado formato. Al final aparece un mensaje para que ingrese la opcion (la parte de como pide queda a disposicion del usuario).
 
-* **menu_ejecutar_opcion**: recibe un puntero al `menu_t` para el menu, un `char` para el caracter y un `void *` por si necesitara usarlo. Transforma el caracter a mayuscula y lo busca con la funcion `lista_buscar_elemento`. Si el item no esta devuelve `false`, caso contrario realiza la accion asociada pasandole el `void *` como parametro.
+* **menu_ejecutar_opcion**: recibe un puntero al `menu_t` para el menu, un `char` para el caracter y dos `void *` por si necesitara usarlos. Transforma el caracter a mayuscula y lo busca con la funcion `lista_buscar_elemento`. Si el item no esta devuelve `false`, caso contrario realiza la accion asociada pasandole el `void *` como parametro.
 
 ## Pokedex
 
@@ -150,15 +150,15 @@ make
 
 Se utilizan todos los archivos y en consecuencia sus funciones. Se inicializa el menu con las opciones, descripciones y acciones ya definidas. Utilizo dos variables de tipo bool que son interfaz y continuar. El menu se va a mostrar mientras que interfaz sea `true` y cuando se pide el ingreso de la opcion se pasa a la funcion `menu_ejecutar_opcion` la direccion de memoria de continuar. Esta se actualiza a `true` o `false` si esta termina en false significa que interfaz debe ser false y termina el ciclo del menu.
 
-* **mostrar_pokedex**: recibe un puntero a `void` con el contexto. Crea una pokedex con la ruta ya establecida en el codigo y la itera en orden mostrando cada uno con un formato decente. Y asigna a contexto como `true`, ya que se desea volver a mostrar el menu.
+* **mostrar_pokedex**: recibe dos puntero a `void`con un flag si debe seguir en el menu y con la ruta del archivo. Crea una pokedex con la ruta ya establecida en el codigo y la itera en orden mostrando cada uno con un formato decente. Y asigna a contexto como `true`, ya que se desea volver a mostrar el menu.
 
-* **juego**: realiza las creaciones de lista y carga de estas como asi de algunos valores importantes a la hora de comenzar el juego.
+* **juego**: recibe un `int` para la semilla y un puntero a `void` con la ruta del archivo. Realiza las creaciones de lista y carga de estas como asi de algunos valores importantes a la hora de comenzar el juego.
 
-* **sin_semilla**: recibe un puntero a `void` con el contexto. Inicializa la semilla random con time, srand, rand y de nuevo srand. Y llama a juego con esa semilla . Esta funcion contiene la inicializacion de las estructuras y comienzo del juego. Y asigna a contexto como `false`, ya que se desea terminar de mostrar el menu.
+* **sin_semilla**: recibe dos punteros a `void` con un flag si debe seguir en el menu y con la ruta del archivo. Inicializa la semilla random con time, srand, rand y de nuevo srand. Y llama a juego con esa semilla . Esta funcion contiene la inicializacion de las estructuras y comienzo del juego. Y asigna a contexto como `false`, ya que se desea terminar de mostrar el menu.
 
-* **con_semilla**: recibe un puntero a `void` con el contexto. Pregunta por la semilla y llama a juego pasandole esa semilla. Esta funcion contiene la inicializacion de las estructuras y comienzo del juego. Y asigna a contexto como `false`, ya que se desea terminar de mostrar el menu.
+* **con_semilla**: recibe dos punteros a `void` con un flag si debe seguir en el menu y con la ruta del archivo. Pregunta por la semilla y llama a juego pasandole esa semilla. Esta funcion contiene la inicializacion de las estructuras y comienzo del juego. Y asigna a contexto como `false`, ya que se desea terminar de mostrar el menu.
 
-* **salir**: recibe un puntero a `void` con el contexto. Y asigna a contexto como `false`, ya que se desea terminar de mostrar el menu.
+* **salir**: recibe dos punteros a `void` con un flag si debe seguir en el menu y con la ruta del archivo . Y asigna a contexto como `false`, ya que se desea terminar de mostrar el menu.
 
 <div  align="center">
 <img  width="90%" src="img/memoria.jpg">
@@ -167,16 +167,28 @@ Se utilizan todos los archivos y en consecuencia sus funciones. Se inicializa el
 
 # TDAs reutilizados
 
-Principalmente fueron utilizados el de `Lista` y el `Pila`. No son tdas pero fueron desarrollados durante la materias los archivos `split` y `csv`.
+Principalmente fueron reutilizados los TDAs `Lista` y `Pila`. A su vez tambien use los archivos que fueron desarrollados al principio de la materias `split` y `csv`.
 
-Para el menu en un principio decidi utilizar el tda-hash, pero me encontre con el problema del orden y como se mostraria. Entonces lo termine descartando y tome el tda-lista. Para mantener el orden de inserccion a la hora de mostrar y no tener que cambiar la implementacion del tda. Al tener que implementar un menu con 4 opciones no se genera tan costoso las operaciones.
+El TDA-Menu se encarga de crear un menu el cual tiene una opcion, descripcion y una accion asociada. En su inicio habia pensado usar el TDA-Hash para la implementacion, pero lo descarte ya que no tenia certeza que al aplicarle la funcion de hash a la descripcion me quedaran en orden. Por lo que me tire a implementarlo con el TDA-Lista. Ademas hay que entender que para este caso el menu tendria solo 4 opciones primordiales, por lo que no serian costosas las operaciones.
 
-Para la pokedex lo vi como una fusion entre el `tp1` y el `tp_lista`. Directamente lo encare por el lado de una lista. Lo mismo que antes no son tantos los pokemones por lo que no se hace tan costoso. Sin embargo en el medio pense utilizar el tda-hash. Pero encontre el mismo problema del orden. Tendria que buscar una funcion de hash que justo me los ordene o hacer algun metodo de ordenamiento. Por lo cual tendria que cambiar la implementacion del tda. Tambien pense la opcion del ABB pero no termine visualizarla del todo y no me cerro.
+El TDA-Pokedex fue una fusion de operaciones que se realizaron entre el `tp1` y el `tp_lista`. Por eso decidi que fuera un TDA. Las operaciones principales son las leer de un archivo los datos y agregarlos a una lista. A su vez tambien esta la idea de obtener un pokemon random como uno en especifico o la de iterar los pokemones. en el medio me surgio de hacerlo con el TDA-Hash, pero paso algo similar a lo que me paso con el TDA-Menu. Ya que al agregar pokemones al aplicarle la funcion de Hash al nombre  no me garantizaba que fueran a distintos indices, por lo que me podria haber quedado una lista de nodos enlazados (era lo mismo que hacer una lista). Mas al final me surgio la posibilidad de hacerlo con el TDA-ABB pero no termine de visualizar como seria.
 
-Para el juego lo que pense que iba a ser un problema costoso en cuanto a memoria iba a ser lo de las rachas como lista. Por eso utilice el tda-pila, permitiendome obtener el ultimo elemento agregado y que la funcion sea O(1). Algo a destacar de este tda es que sufrio las modificaciones de haber pasado de entrega a re-entrega y despues una "re-re-entrega". Para reducir los errores. 
+Para no implementar toda la logica del juego en el archivo del `tp2` decidi hacerlo en otro archivo. En este sente las estructuras que necesitaria para almacenar los datos necesarios durante el juego. Crea algunas estructuras pidiendo memoria y despues la libera, procesa la entrada y por siguiente los movimientos y el puntaje. En este "TDA" fue que implemente el TDA-Pila para el uso de racha y optimizar las operaciones. A la hora de atrapar se guarda en la racha actual si se atrapa uno que aumenta la racha se sigue agregando a esa pila si se corta la racha se compara con la racha mas larga (inicialmente vacia) y hace desapilamientos de `rachaActual` a apilamientos a `rachaMayor`. Ya que a lahora de mostrar la racha mas larga va a ser solo desapilar el ultimo elemento y lo voy mostrando. Todo es optimiza la operaciones ya que el TDA-Lista esta implementado con un puntero al primer nodo como al ultimo nodo.
+
+*Ambos TDAs usados fueron modificados para bien, despues de la pre-entrega, pre-re-entrega o post-entrega y post-re-entrega* 
 
 # Comentario extra
 
-En el secundario empezamos viendo diagramas de flujos, luego pseudocodigo y por ultimo python (muy basico). Y desde ese momento se me hacia muy dificil visualizar un juego hecho en python ya que pensaba "como logro toda la interfaz esa, no se puede". Y me meti en la carrera. Justo hicieron el cambio por lo que tuve pensamiento computacional. Lo que odie el uso de las funciones porque no terminaba de entender el uso del `return` entonces nunca modularizaba. Al final la promocione. Y en Fundamentos de programacion vimos lo basico y me quedo un mal gusto del lenguaje este pensaba que era "viejo" y que hoy en dia hay otros nuevos que sirven para hoy. Tambien la aprobe. Y aca estoy, decidi meterme aca sabiendo que era conocida por la entrega de los tps uno atras del otro. Y me adapte con el primero que tuve problema fue con el `tp1` por el uso de la memoria. La profesora me comento unas cosas y las intente implementar y despues de eso entendi mejor el uso de los `mallocs`, `reallocs` y `frees`. Para el de ABB fui canchero pero tampoco me llevo tan bien con la recursion. Y el de hash me costo ver a que se referia la tabla, pero sacando eso de lado pude. Y para este tp que decir, lo borre y arranque de nuevo 3 veces porque cada vez que implementaba algo nuevo rompia y habia perdia de memoria o accedia a memoria liberada. Por eso por ahi una parte esta media confusa o parece medio innecesaria pero estuve en los pensamientos de "funciona no lo toques". En este momento puedo decir que funciona (lo probe con varias personas a mi alredor desde conocidos de menos de 10 años, hermanas, amigos/as y pareja). 
+En el secundario empezamos viendo diagramas de flujos, luego pseudocodigo y por ultimo python cosas muy basicas. Y desde ese momento se me hacia muy dificil visualizar un juego hecho en python ya que pensaba "como logro toda la interfaz esa, no se puede" (por el hecho de una interfaz grafica de un juego de hoy en dia). 
 
-Finalmente puedo decir, que se me fue el mal gusto a C y le agarre la mano.
+Y me meti en la carrera por las computadoras y la matematica. Al momento de la inscripcion al CBC justo hicieron el cambio por lo que tuve pensamiento computacional. Lo que odie el uso de las funciones porque no terminaba de entender el uso del `return` por lo nunca me gustaba modularizar ya que no lo terminaba de entener. Al final la promocione. 
+
+Ya en la "carrera" cursando Fundamentos de programacion vimos lo basico y no tuvimos que hacer ninguna entrega de nada practicamente. Por lo que me quedo un mal gusto del lenguaje, en ese momento pensaba que para que veiamos un lenguaje "viejo" y que hoy en dia hay otros nuevos que sirven para las cosas hoy. Para colmo, tambien la aprobe. 
+
+Y aca estoy, decidi meterme en esta catedra sabiendo que tenia bastantes entregas de tps (lo que no sabia era que eran uno atras del otro) por lo que necesite adaptarme al ritmo rapido. Y me adapte, con el primero que tuve problema fue con el `tp1` por el uso de la memoria. La profesora me comento unas cosas y las intente implementar y despues de eso pude entender mucho mejor el uso de los `mallocs`, `reallocs` y `frees`. Para el de ABB fui canchero  con el uso de la memoria, pero no con la recursion (si de por si odio las funciones tener que llamarla desde dentro era peor todavia). Y con  TDA de hash me costo ver a que hacia referencia el concepto de *tabla*, pero sacando eso de lado pude. 
+
+Y llegue al ultimo, al principio costo la idea de implementar el menu, pero pude. Despues segui con el de pokedex que fue paracido al `tp1` y `tp_lista` con eso fue lo unico que tuve problemas. La clase que vimos un poco como empezar a implementar el tp fue de muchisima ayuda. Y pude empezar a encararlo, pero hubieron inconvenientes. Cuando lograba implementar que se movieran y comieran y aparecieran mas en algun punto o rompia o habia perdida de memoria o intentaba a acceder a memoria que ya fue liberada. Por ese motivo lo borre y arraque 3 veces el tp. Por eso me dije "vamos a calmarnos y lo empezamos junto a las pruebas" y asi salio. Si es cierto que hay algunas partes que no son tan claras o las mejores opciones pero fue tanta la frustracion que si lograba cumplir algo me hacia un *git add* y *git commit* a mi repositorio para guardar el progreso y saber desde cuando empezo a romper. 
+
+En este momento puedo decir que funciona que el juego se puede jugar(lo probaron hermanas, amigos/as y pareja y la primita de ella).
+
+Finalmente puedo decir, que me gusta el lenguaje C, perdi todos los miedos y le agarre la mano.
