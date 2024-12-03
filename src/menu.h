@@ -14,7 +14,7 @@
 typedef struct menuItem {
 	char opcion;
 	char *descripcion;
-	bool (*accion)(void *);
+	bool (*accion)(void *, void *);
 } menuItem_t;
 
 typedef struct menu {
@@ -37,7 +37,7 @@ void menu_destruir(menu_t *menu, void (*destructor)(void *));
 * Devuelve true si la opcion fue agregada correctamente, false en caso contrario.
 */
 bool menu_agregar_opcion(menu_t *menu, char opcion, char *descripcion,
-			 bool (*accion)(void *));
+			 bool (*accion)(void *, void *));
 
 /*
 * Muestra el menu por pantalla.
@@ -48,6 +48,7 @@ void menu_mostrar(menu_t *menu);
 * Ejecuta la opcion seleccionada.
 * Devuelve true si la opcion fue ejecutada correctamente, false en caso contrario.
 */
-bool menu_ejecutar_opcion(menu_t *menu, char opcion, void *contexto);
+bool menu_ejecutar_opcion(menu_t *menu, char opcion, void *contexto,
+			  void *contexto2);
 
 #endif // MENU_H

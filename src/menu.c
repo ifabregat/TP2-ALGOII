@@ -36,7 +36,7 @@ int comparar_opciones(void *a, void *b)
 }
 
 bool menu_agregar_opcion(menu_t *menu, char opcion, char *descripcion,
-			 bool (*accion)(void *))
+			 bool (*accion)(void *, void *))
 {
 	if (!menu || !descripcion) {
 		return false;
@@ -91,7 +91,8 @@ void menu_mostrar(menu_t *menu)
 	printf("\nSeleccione una opcion: ");
 }
 
-bool menu_ejecutar_opcion(menu_t *menu, char opcion, void *contexto)
+bool menu_ejecutar_opcion(menu_t *menu, char opcion, void *contexto,
+			  void *contexto2)
 {
 	if (!menu || !menu->opciones)
 		return false;
@@ -107,7 +108,7 @@ bool menu_ejecutar_opcion(menu_t *menu, char opcion, void *contexto)
 	}
 
 	if (item->accion) {
-		return item->accion(contexto);
+		return item->accion(contexto, contexto2);
 	}
 
 	return false;
