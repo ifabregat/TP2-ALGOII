@@ -689,9 +689,9 @@ void elegirOpcion()
 	menu_agregar_opcion(menu, 'a', descripcion, imprimirA);
 	menu_agregar_opcion(menu, 'b', descripcion2, imprimirB);
 
-	pa2m_afirmar(menu_ejecutar_opcion(menu, 'a', NULL),
+	pa2m_afirmar(menu_ejecutar_opcion(menu, 'a', NULL, NULL),
 		     "Puedo elegir la opcion a");
-	pa2m_afirmar(menu_ejecutar_opcion(menu, 'b', NULL),
+	pa2m_afirmar(menu_ejecutar_opcion(menu, 'b', NULL, NULL),
 		     "Puedo elegir la opcion b");
 
 	menu_destruir(menu, destructo_menu);
@@ -731,7 +731,7 @@ void seleccionarOpcion()
 	if (scanf("%c", &opcion) != 1)
 		printf("Error al leer la opcion\n");
 
-	menu_ejecutar_opcion(menu, opcion, NULL);
+	menu_ejecutar_opcion(menu, opcion, NULL, NULL);
 
 	menu_destruir(menu, destructo_menu);
 }
@@ -843,7 +843,7 @@ void menuMostrarPokedex()
 
 	printf("\n");
 
-	menu_ejecutar_opcion(menu, opcion, NULL);
+	menu_ejecutar_opcion(menu, opcion, NULL, NULL);
 
 	menu_destruir(menu, destructo_menu);
 }
