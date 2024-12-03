@@ -118,7 +118,7 @@ make
 
 * **destructor_pokemones_tablero**: recibe un `void *`. Se encarga de liberar la memoria pedida para los datos tipo `pokemonTablero`.
 
-* **tablero_crear**: recibe un puntero a `Lista`. Asigna el alto y ancho a los valores 15 y 32. Reserva memoria para un **char** para cada celda de la matriz (por eso **char ****) y los inicializa con un espacio en blanco con `memset`. Asigna la lista pasada por parametro a lista de los pokemones y crea una lista para los atrapados.
+* **tablero_crear**: recibe un puntero a `Lista`. Asigna el alto y ancho a los valores 15 y 32. Reserva memoria para un **char** para cada celda de la matriz (por eso **char** ** ) y los inicializa con un espacio en blanco con `memset`. Asigna la lista pasada por parametro a lista de los pokemones y crea una lista para los atrapados.
 
 * **tablero_destruir**: recibe un puntero a `tablero_t` y un puntero a la funcion `destructor`. Se encarga de liberar la memoria pedida para cada celda y utiliza la funcion de `lista_destruir_todo` para destruir las listas con el `destructor` pasado.
 
