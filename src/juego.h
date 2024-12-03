@@ -134,6 +134,11 @@ void procesar_entrada(int entrada, jugador_t *jugador, Lista *pokemones);
 void administrar_puntaje(jugador_t *jugador, pokemonTablero_t *pokemon);
 
 /*
+* Junta las acciones que se deben realizar al atrapar un pokemon.
+*/
+void atrapar_pokemon(juego_t *juego, pokemonTablero_t *pokemon);
+
+/*
 * Contiene la logica del juego.
 */
 int logica(int entrada, void *data);
